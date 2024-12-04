@@ -60,7 +60,6 @@ public class AuthController {
 
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
-        user.setRoles(roles);
 
         userRepository.save(user);
 
