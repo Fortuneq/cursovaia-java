@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Система перевозки грузов</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            color: black;
+        }
+        .table tr td, .table tr th {
+            color: black;
+        }
+        .sort-links {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">
+                Главная страница
+            </a>
+            <div class="d-flex">
+                <a th:href="@{/admin/users}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Управление пользователями</a>
+                <a th:href="@{/blog/admin}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Административная панель блога</a>
+                <a th:href="@{/blog/}" class="btn btn-outline-light">Главная страница блога</a>
+                <a th:href="@{/logout}" class="btn btn-outline-light">Выйти</a>
+            </div>
+        </div>
+    </nav>
+    <blockquote class="blockquote text-center"><h1>Система перевозки грузов</h1></blockquote>
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h4>Поиск груза по любому критерию:</h4>
+            <form th:action="@{/search}" class="d-flex justify-content-center">
+                <input type="text" name="keyword" id="keyword" size="70" th:value="${keyword}"
+                       class="form-control me-2" placeholder="Введите ключевое слово"/>
+                <input type="submit" class="btn btn-success btn-sm me-2" value="Поиск"/>
+                <input type="button" class="btn btn-warning btn-sm me-2" value="Очистить" id="btnClear"
+                       onclick="clearSearch()"/>
+            </form>
+        </div>
+    </div>
+    <table id="cargoTable" class="table">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Название груза</th>
+            <th scope="col">Содержимое груза</th>
+            <th scope="col">Город отправки</th>
+            <th scope="col">Дата отправки</th>
+            <th scope="col">Город прибытия</th>
+            <th scope="col">
+                <a th:href="@{${'/'}(sort='old_to_new')}" class="sort-links">Дата прибытия &#9650;</a>
+                <a th:href="@{${'/'}(sort='new_to_old')}" class="sort-links"> &#9660;</a>
+            </th>
+            <th scope="col" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cargo : ${listCargo}">
+            <th scope="row" th:text="${cargo.id}">ID груза отсутствует</th>
+            <td th:text="${cargo.name}">Название груза отсутствует</td>
+            <td th:text="${cargo.content}">Содержимое груза отсутствует</td>
+            <td th:text="${cargo.cityofdeparture}">Город отправки отсутствует</td>
+            <td th:text="${cargo.dateofdeparture}">Дата отправки отсутствует</td>
+            <td th:text="${cargo.cityofarrival}">Город прибытия отсутствует</td>
+            <td th:text="${cargo.dateofarrival}">Дата прибытия отсутствует</td>
+            <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <button type="button" class="btn btn-info" th:onclick="'editCargo(' + ${cargo.id} + ')'">Редактировать</button>
+                <button type="button" class="btn btn-danger" th:onclick="'deleteCargo(' + ${cargo.id} + ')'">Удалить</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p>
+        <script type="text/javascript">
+            function getRowsColumn() {
+                let table = document.getElementById('cargoTable');
+                let tBody = table.querySelector('tbody');
+                const count = tBody.querySelectorAll('tr').length;
+                document.write('Количество грузов в таблице: ' + count);
+            }
+
+            getRowsColumn();
+        </script>
+    </p>
+    <blockquote class="blockquote text-center">
+        <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off" onclick="showAddCargoModal()">
+            Добавить груз
+        </button>
+        <!-- <a href="/histogram">
+            <button type="button" class="btn btn-secondary" data-toggle="button" aria-pressed="false" autocomplete="off">
+                Гистограмма
+            </button>
+        </a> -->
+    </blockquote>
+</div>
+
+<!-- Modal for Adding Cargo -->
+<div class="modal fade" id="addCargoModal" tabindex="-1" aria-labelledby="addCargoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCargoModalLabel">Добавить груз</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCargoForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название груза</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Содержимое груза</label>
+                        <input type="text" class="form-control" id="content" name="content" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cityofdeparture" class="form-label">Город отправки</label>
+                        <input type="text" class="form-control" id="cityofdeparture" name="cityofdeparture" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateofdeparture" class="form-label">Дата отправки</label>
+                        <input type="date" class="form-control" id="dateofdeparture" name="dateofdeparture" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cityofarrival" class="form-label">Город прибытия</label>
+                        <input type="text" class="form-control" id="cityofarrival" name="cityofarrival" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateofarrival" class="form-label">Дата прибытия</label>
+                        <input type="date" class="form-control" id="dateofarrival" name="dateofarrival" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="saveCargo()">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Cargo -->
+<div class="modal fade" id="editCargoModal" tabindex="-1" aria-labelledby="editCargoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCargoModalLabel">Редактировать груз</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCargoForm">
+                    <input type="hidden" id="editCargoId" name="id">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Название груза</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editContent" class="form-label">Содержимое груза</label>
+                        <input type="text" class="form-control" id="editContent" name="content" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCityofdeparture" class="form-label">Город отправки</label>
+                        <input type="text" class="form-control" id="editCityofdeparture" name="cityofdeparture" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDateofdeparture" class="form-label">Дата отправки</label>
+                        <input type="date" class="form-control" id="editDateofdeparture" name="dateofdeparture" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCityofarrival" class="form-label">Город прибытия</label>
+                        <input type="text" class="form-control" id="editCityofarrival" name="cityofarrival" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDateofarrival" class="form-label">Дата прибытия</label>
+                        <input type="date" class="form-control" id="editDateofarrival" name="dateofarrival" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="updateCargo()">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<canvas id="histogramChart" width="400" height="200"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showAddCargoModal() {
+        var myModal = new bootstrap.Modal(document.getElementById('addCargoModal'));
+        myModal.show();
+    }
+
+    function saveCargo() {
+        var formData = new FormData(document.getElementById('addCargoForm'));
+        fetch('/save', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                location.reload();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function editCargo(id) {
+        fetch('/edit/' + id)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editCargoId').value = data.id;
+                document.getElementById('editName').value = data.name;
+                document.getElementById('editContent').value = data.content;
+                document.getElementById('editCityofdeparture').value = data.cityofdeparture;
+                document.getElementById('editDateofdeparture').value = data.dateofdeparture;
+                document.getElementById('editCityofarrival').value = data.cityofarrival;
+                document.getElementById('editDateofarrival').value = data.dateofarrival;
+                var myModal = new bootstrap.Modal(document.getElementById('editCargoModal'));
+                myModal.show();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function updateCargo() {
+        var formData = new FormData(document.getElementById('editCargoForm'));
+        fetch('/save', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                location.reload();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function deleteCargo(id) {
+        if (confirm('Вы уверены, что хотите удалить этот груз?')) {
+            fetch('/delete/' + id, {
+                method: 'DELETE'
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    location.reload();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function clearSearch() {
+        window.location = "[[@{/}]]";
+    }
+
+    async function fetchHistogramData() {
+        const response = await fetch('/histogram-data');
+        const data = await response.json();
+        return data;
+    }
+
+    async function createHistogram() {
+        const data = await fetchHistogramData();
+        const labels = data.map(item => new Date(item[0]).toLocaleDateString());
+        const counts = data.map(item => item[1]);
+
+        const ctx = document.getElementById('histogramChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Количество грузов',
+                    data: counts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    createHistogram();
+</script>
+</body>
+</html>

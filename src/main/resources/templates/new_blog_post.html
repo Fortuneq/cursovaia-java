@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Добавить запись в блог</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+<div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" th:href="@{/}">
+        Главная страница
+      </a>
+      <div class="d-flex">
+        <a th:href="@{/admin/users}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Управление пользователями</a>
+        <a th:href="@{/logout}" class="btn btn-outline-light">Выйти</a>
+      </div>
+    </div>
+  </nav>
+  <h2 class="text-center mt-4">Добавить запись в блог</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form action="#" th:action="@{/blog/save}" th:object="${blogPost}" method="post">
+        <table class="table">
+          <tr>
+            <td>Название записи:</td>
+            <td><input type="text" th:field="*{title}" class="form-control"></td>
+          </tr>
+          <tr>
+            <td>Текст записи:</td>
+            <td><textarea th:field="*{content}" class="form-control"></textarea></td>
+          </tr>
+          <tr>
+            <td colspan="2" class="text-center">
+              <button type="submit" class="btn btn-primary">Сохранить</button>
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>
