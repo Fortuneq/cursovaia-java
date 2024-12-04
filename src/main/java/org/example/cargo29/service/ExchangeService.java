@@ -33,20 +33,7 @@ public class ExchangeService {
 
     // Принятие заявки на обмен
     public void acceptRequest(User user, Long requestId) {
-        ExchangeRequest request = exchangeRequestRepository.findById(requestId).orElse(null);
-        if (request != null && request.getStatus() == ExchangeRequest.Status.PENDING) {
-            // Проверка баланса пользователя
-            if (user.getBalances().get(request.getSourceCurrency()) >= request.getSourceAmount()) {
-                // Перевод средств
-                userService.updateBalance(user, request.getSourceCurrency(), -request.getSourceAmount());
-                userService.updateBalance(user, request.getTargetCurrency(), request.getTargetAmount());
-                request.setStatus(ExchangeRequest.Status.COMPLETED); // Статус выполнен
-                exchangeRequestRepository.save(request);
-            } else {
-                request.setStatus(ExchangeRequest.Status.FAILED); // Статус неудачи
-                exchangeRequestRepository.save(request);
-            }
-        }
+
     }
 
     public void createRequest(ExchangeRequest order) {

@@ -21,6 +21,11 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    // Поиск пользователя по ID
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
     // Обновление баланса пользователя
     public void updateBalance(User user, String currency, Double amount) {
         Map<String, Double> balances = user.getBalances();
@@ -28,6 +33,7 @@ public class UserService {
         user.setBalances(balances);
         userRepository.save(user);
     }
+
 
     // Другие методы
 }

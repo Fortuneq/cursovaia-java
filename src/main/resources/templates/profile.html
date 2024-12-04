@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль</title>
+</head>
+<body>
+<h1>Профиль пользователя</h1>
+<p>Имя пользователя: {{ user.username }}</p>
+
+<h2>Баланс:</h2>
+<ul>
+    <li>USD: {{ user.balances['USD'] }}</li>
+    <li>EUR: {{ user.balances['EUR'] }}</li>
+    <li>GBP: {{ user.balances['GBP'] }}</li>
+    <li>JPY: {{ user.balances['JPY'] }}</li>
+</ul>
+
+<h2>Мои заявки:</h2>
+<ul>
+    <li th:each="request : ${exchangeRequests}">
+        <p>Заявка: {{ request.sourceCurrency }} → {{ request.targetCurrency }}</p>
+        <p>Статус: {{ request.status }}</p>
+    </li>
+</ul>
+
+<a href="/balance/top-up">Пополнить баланс</a><br>
+<a href="/orders/create">Создать заявку</a>
+</body>
+</html>
