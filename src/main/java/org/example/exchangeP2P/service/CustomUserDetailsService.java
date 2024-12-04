@@ -1,12 +1,11 @@
-package org.example.cargo29.service;
+package org.example.exchangeP2P.service;
 
-import org.example.cargo29.entity.User;
-import org.example.cargo29.repository.UserRepository;
+import org.example.exchangeP2P.entity.User;
+import org.example.exchangeP2P.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service

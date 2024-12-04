@@ -1,7 +1,7 @@
-package org.example.cargo29.repository;
+package org.example.exchangeP2P.repository;
 
-import org.example.cargo29.entity.ExchangeRequest;
-import org.example.cargo29.entity.User;
+import org.example.exchangeP2P.entity.ExchangeRequest;
+import org.example.exchangeP2P.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

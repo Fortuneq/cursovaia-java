@@ -1,4 +1,4 @@
-package org.example.cargo29;
+package org.example.exchangeP2P;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,11 +1,9 @@
-package org.example.cargo29.controller;
+package org.example.exchangeP2P.controller;
 
-import org.example.cargo29.entity.ExchangeRequest;
-import org.example.cargo29.entity.User;
-import org.example.cargo29.service.ExchangeService;
-import org.example.cargo29.service.UserService;
+import org.example.exchangeP2P.entity.ExchangeRequest;
+import org.example.exchangeP2P.service.ExchangeService;
+import org.example.exchangeP2P.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

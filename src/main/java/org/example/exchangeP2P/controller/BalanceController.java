@@ -1,7 +1,7 @@
-package org.example.cargo29.controller;
+package org.example.exchangeP2P.controller;
 
-import org.example.cargo29.entity.User;
-import org.example.cargo29.service.UserService;
+import org.example.exchangeP2P.entity.User;
+import org.example.exchangeP2P.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,9 +1,8 @@
-package org.example.cargo29.service;
+package org.example.exchangeP2P.service;
 
-import org.example.cargo29.entity.ExchangeRequest;
-import org.example.cargo29.entity.User;
-import org.example.cargo29.repository.ExchangeRequestRepository;
-import org.example.cargo29.repository.UserRepository;
+import org.example.exchangeP2P.entity.ExchangeRequest;
+import org.example.exchangeP2P.entity.User;
+import org.example.exchangeP2P.repository.ExchangeRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

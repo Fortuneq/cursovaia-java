@@ -1,4 +1,4 @@
-package org.example.cargo29.entity;
+package org.example.exchangeP2P.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

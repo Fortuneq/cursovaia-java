@@ -1,4 +1,4 @@
-package org.example.cargo29.controller;
+package org.example.exchangeP2P.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
