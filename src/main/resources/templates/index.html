@@ -1,26 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Главная страница</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Обмен валют</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">Главная страница</a>
-        <div class="d-flex">
-            <a href="/profile" class="btn btn-outline-light">Профиль</a>
-            <a href="/logout" class="btn btn-outline-light">Выйти</a>
-        </div>
+
+<header>
+    <nav>
+        <ul>
+            <li><a href="/">Главная</a></li>
+            <li><a href="/orders/create">Создать ордер</a></li>
+            <li><a href="/profile">Профиль</a></li>
+            <li><a href="/logout">Выйти</a></li>
+        </ul>
+    </nav>
+</header>
+
+<section class="orders">
+    <h1>Список ордеров</h1>
+
+    <div class="filters">
+        <h3>Фильтрация ордеров</h3>
+        <form method="GET" action="/">
+            <label for="currency">Валюта:</label>
+            <select id="currency" name="currency">
+                <option value="">Все валюты</option>
+                <option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}"></option>
+            </select>
+
+            <label for="amount">Количество (от):</label>
+            <input type="number" id="amount" name="amount" min="0" step="any">
+
+            <label for="price">Цена (от):</label>
+            <input type="number" id="price" name="price" min="0" step="any">
+
+            <button type="submit">Применить фильтры</button>
+        </form>
     </div>
-</nav>
-<div class="container mt-4">
-    <h2>Добро пожаловать в систему обмена валют!</h2>
-    <div class="mt-4">
-        <a href="/orders/create" class="btn btn-primary">Создать ордер на обмен валют</a>
-        <a href="/balance/top-up" class="btn btn-success">Пополнить баланс</a>
+
+    <div class="order-list">
+        <table>
+            <thead>
+            <tr>
+                <th>Источник</th>
+                <th>Сумма</th>
+                <th>Целевая валюта</th>
+                <th>Целевая сумма</th>
+                <th>Цена</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.sourceCurrency}"></td>
+                <td th:text="${order.sourceAmount}"></td>
+                <td th:text="${order.targetCurrency}"></td>
+                <td th:text="${order.targetAmount}"></td>
+                <td th:text="${order.price}"></td>
+                <td th:text="${order.status}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-</div>
+</section>
+
+<footer>
+    <p>&copy; 2024 P2P Обмен валют</p>
+</footer>
+
 </body>
 </html>

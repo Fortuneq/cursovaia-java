@@ -6,6 +6,8 @@ import org.example.exchangeP2P.repository.ExchangeRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ExchangeService {
     private final ExchangeRequestRepository exchangeRequestRepository;
@@ -33,6 +35,23 @@ public class ExchangeService {
     // Принятие заявки на обмен
     public void acceptRequest(User user, Long requestId) {
 
+    }
+
+
+    public List<ExchangeRequest> getAllOrders() {
+        return exchangeRequestRepository.findAll();
+    }
+
+
+    public List<ExchangeRequest> getFilteredOrders(String currency, Double minAmount, Double minPrice, Double maxPrice, String username) {
+        if (currency != null && minAmount != null) {
+            return exchangeRequestRepository.findByCurrencyAndAmountGreaterThanEqual(currency, minAmount);
+        } else if (currency != null && minPrice != null && maxPrice != null) {
+            return exchangeRequestRepository.findByCurrencyAndPriceBetween(currency, minPrice, maxPrice);
+        } else if (currency != null && username != null) {
+            return exchangeRequestRepository.findByCurrencyAndUserUsername(currency, username);
+        }
+        return exchangeRequestRepository.findAll(); // Возвращаем все ордера, если фильтры не указаны
     }
 
     public void createRequest(ExchangeRequest order) {

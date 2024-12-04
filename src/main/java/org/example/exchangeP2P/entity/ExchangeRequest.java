@@ -38,6 +38,9 @@ public class ExchangeRequest {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    public void setCurrency(String usd) {
+    }
+
     public enum Status {
         PENDING, COMPLETED, FAILED
     }
