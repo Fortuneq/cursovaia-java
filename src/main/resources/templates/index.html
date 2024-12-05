@@ -43,19 +43,15 @@
         <h4>Фильтрация ордеров</h4>
         <form class="row" th:action="@{/}" method="GET">
             <div class="col-md-3">
-                <label for="currency" class="form-label">Валюта</label>
-                <select id="currency" name="currency" class="form-select">
-                    <option value="">Все валюты</option>
-                    <option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}"></option>
+                <label for="keyword" class="form-label">Поиск</label>
+                <input type="text" id="keyword" name="keyword" class="form-control" th:value="${keyword}" placeholder="Введите валюту или статус">
+            </div>
+            <div class="col-md-3">
+                <label for="sort" class="form-label">Сортировка</label>
+                <select id="sort" name="sort" class="form-select">
+                    <option value="asc" th:selected="${sort == 'asc'}">По возрастанию</option>
+                    <option value="desc" th:selected="${sort == 'desc'}">По убыванию</option>
                 </select>
-            </div>
-            <div class="col-md-3">
-                <label for="amount" class="form-label">Сумма (от)</label>
-                <input type="number" id="amount" name="amount" class="form-control" min="0" step="any">
-            </div>
-            <div class="col-md-3">
-                <label for="price" class="form-label">Цена (от)</label>
-                <input type="number" id="price" name="price" class="form-control" min="0" step="any">
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary btn-filter">Применить фильтры</button>
@@ -77,6 +73,13 @@
             </tr>
             </thead>
             <tbody>
+            <tr th:each="order : ${listOrder}">
+                <td th:text="${order.sourceCurrency}"></td> <!-- Исходная валюта -->
+                <td th:text="${order.amount}"></td> <!-- Сумма -->
+                <td th:text="${order.targetCurrency}"></td> <!-- Целевая валюта -->
+                <td th:text="${order.price}"></td> <!-- Цена -->
+                <td th:text="${order.status}"></td> <!-- Статус -->
+            </tr>
             </tbody>
         </table>
     </div>

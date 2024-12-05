@@ -13,9 +13,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.validation.constraints.NotBlank;
 
 
+@Setter
+@Getter
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+    // Геттеры и сеттеры
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +28,10 @@ public class User implements UserDetails {
     @NotBlank(message = "Пароль обязателен")
     @Column(nullable=false)
     private String password;
+
+    @Column(nullable = false)
+    private double balance = 0.0;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="users_roles",
@@ -32,31 +39,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name="role_id")
     )
     private Set<org.example.exchangeP2P.entity.Role> roles;
-    // Геттеры и сеттеры
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public Set<org.example.exchangeP2P.entity.Role> getRoles() {
-        return roles;
-    }
-    public void setRoles(Set<org.example.exchangeP2P.entity.Role> roles) {
-        this.roles = roles;
-    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

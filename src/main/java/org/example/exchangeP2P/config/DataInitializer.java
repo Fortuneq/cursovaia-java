@@ -37,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
             return roleRepository.save(role);
         });
         // Создание администратора, если его нет
-        if(!userRepository.findByUsername("DimaK").isPresent()){
+        if(userRepository.findByUsername("DimaK").isEmpty()){
             User admin = new User();
             admin.setUsername("DimaK");
             admin.setPassword(passwordEncoder.encode("7301"));
