@@ -18,27 +18,21 @@ import java.util.Set;
 
 @Controller
 public class AuthController {
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @GetMapping("/register")
     public String showRegistrationForm(Model model){
         model.addAttribute("user", new User());
         return "login"; // Используем один шаблон для регистрации и входа
     }
-
     @GetMapping("/login")
     public String login() {
         return "login";
     }
-
     @PostMapping("/register")
     public @ResponseBody String registerUser(@Valid @ModelAttribute("user") User user,
                                              BindingResult result,
@@ -46,23 +40,18 @@ public class AuthController {
         if(result.hasErrors()){
             return "Ошибка регистрации: " + result.getAllErrors().toString();
         }
-
         if(userRepository.findByUsername(user.getUsername()).isPresent()){
             return "Имя пользователя уже существует";
         }
-
         // Шифрование пароля
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         // Назначение роли "USER" по умолчанию
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Роль USER не найдена"));
-
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
-
+        user.setRoles(roles);
         userRepository.save(user);
-
         return "Регистрация прошла успешно!";
     }
 }

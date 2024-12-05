@@ -14,13 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    private final CustomUserDetailsService customUserDetailsService;
-
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    public SecurityConfig(CustomUserDetailsService userDetailsService){
+        this.userDetailsService = userDetailsService;
     }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -42,24 +39,19 @@ public class SecurityConfig {
                 )
                 // Отключить CSRF для простоты (не рекомендуется для продакшена)
                 .csrf(AbstractHttpConfigurer::disable);
-
+        // Установить аутентификационный провайдер
         http.authenticationProvider(authenticationProvider());
-
-
         return http.build();
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(customUserDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
+    public DaoAuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 }

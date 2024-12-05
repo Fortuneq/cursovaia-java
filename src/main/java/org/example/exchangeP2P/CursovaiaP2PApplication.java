@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Cargo29Application {
+public class CursovaiaP2PApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Cargo29Application.class, args);
+		SpringApplication.run(CursovaiaP2PApplication.class, args);
 	}
 
 }

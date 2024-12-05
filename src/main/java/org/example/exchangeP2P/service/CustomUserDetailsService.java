@@ -3,6 +3,7 @@ package org.example.exchangeP2P.service;
 import org.example.exchangeP2P.entity.User;
 import org.example.exchangeP2P.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
