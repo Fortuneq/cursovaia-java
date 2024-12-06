@@ -10,8 +10,11 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE " +
-            "LOWER(o.sourceCurrency) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(o.targetCurrency) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "LOWER(o.sourceCurrency.code) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(o.targetCurrency.code) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(o.status) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Order> search(String keyword);
+
+
+    List<Order> findByUserId(Long userId);
 }

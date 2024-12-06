@@ -29,8 +29,8 @@ public class User implements UserDetails {
     @Column(nullable=false)
     private String password;
 
-    @Column(nullable = false)
-    private double balance = 0.0;
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserBalances> balances = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -46,6 +46,28 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
     }
+
+    public void addFunds(Currency currency, double amount) {
+        UserBalances userBalance = getBalanceForCurrency(currency);
+        if (userBalance == null) {
+            userBalance = new UserBalances();
+            userBalance.setUser(this);
+            userBalance.setCurrency(currency);
+            userBalance.setBalance(amount);
+            balances.add(userBalance);
+        } else {
+            userBalance.addBalance(amount);
+        }
+    }
+
+
+    public UserBalances getBalanceForCurrency(Currency currency) {
+        return balances.stream()
+                .filter(userBalance -> userBalance.getCurrency().equals(currency))
+                .findFirst()
+                .orElse(null);
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

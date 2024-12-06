@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя</title>
+    <title>О Авторе</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,26 +59,6 @@
             color: #555;
         }
 
-        .actions {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .actions a {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 0 5px;
-            background-color: #4caf50;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .actions a:hover {
-            background-color: #45a049;
-        }
-
         .footer {
             background-color: #f4f4f9;
             text-align: center;
@@ -86,49 +66,56 @@
             font-size: 14px;
             color: #777;
         }
+
+        .footer a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">Профиль пользователя</div>
+    <div class="header">О Авторе</div>
     <div class="content">
-        <h2>Детали профиля</h2>
+        <h2>Информация</h2>
         <table>
             <tr>
-                <th>ID</th>
-                <td th:text="${user.id}"></td>
+                <th>Имя</th>
+                <td>Владислав</td>
             </tr>
             <tr>
-                <th>Имя пользователя</th>
-                <td th:text="${user.username}"></td>
+                <th>Фамилия</th>
+                <td>Волков</td>
             </tr>
-        </table>
-
-        <h3>Ваши валюты и балансы</h3>
-        <table>
-            <thead>
             <tr>
-                <th>Валюта</th>
-                <th>Баланс</th>
+                <th>Отчество</th>
+                <td>Юрьвеич</td>
             </tr>
-            </thead>
-            <tbody>
-            <!-- Пробегаем по балансам пользователя -->
-            <tr th:each="balance : ${user.balances}">
-                <td th:text="${balance.currency.name}"></td>
-                <td th:text="${balance.balance}"></td>
+            <tr>
+                <th>Номер группы</th>
+                <td>ПИ22-2в</td>
             </tr>
-            </tbody>
+            <tr>
+                <th>Название проекта</th>
+                <td>Информационная система для P2P обмена валют</td>
+            </tr>
+            <tr>
+                <th>Дата сдачи</th>
+                <td>20 декабря 2024 года</td>
+            </tr>
+            <tr>
+                <th>Имя руководителя</th>
+                <td>Андропов Дмитрий</td>
+            </tr>
         </table>
-    </div>
-    <div class="actions">
-        <a href="/orders/create">Создать заявку</a>
-        <a href="/orders">Мои заявки</a>
-        <a href="/logout">Выйти</a>
     </div>
     <div class="footer">
-        © 2024 Информационная система для P2P обмена валют
+        © 2024 Волков Владислав. Все права защищены.
     </div>
 </div>
 

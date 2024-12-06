@@ -33,6 +33,8 @@
             <div class="d-flex">
                 <a th:href="@{/orders/create}" class="btn btn-outline-light">Создать ордер</a>
                 <a th:href="@{/profile}" class="btn btn-outline-light">Профиль</a>
+                <a th:href="@{/balance}" class="btn btn-outline-light">Пополнить баланс</a>
+                <a th:href="@{/author}" class="btn btn-outline-light">Об Авторе</a>
                 <a th:href="@{/logout}" class="btn btn-outline-light">Выйти</a>
             </div>
         </div>
@@ -41,14 +43,13 @@
 
     <div class="filters container">
         <h4>Фильтрация ордеров</h4>
-        <form class="row" th:action="@{/}" method="GET">
+        <form class="row" th:action="@{/orders}" method="GET">
             <div class="col-md-3">
                 <label for="keyword" class="form-label">Поиск</label>
                 <input type="text" id="keyword" name="keyword" class="form-control" th:value="${keyword}" placeholder="Введите валюту или статус">
             </div>
             <div class="col-md-3">
                 <label for="sort" class="form-label">Сортировка</label>
-
                 <select id="sort" name="sort" class="form-select">
                     <option value="asc" th:selected="${sort == 'asc'}">По возрастанию</option>
                     <option value="desc" th:selected="${sort == 'desc'}">По убыванию</option>
@@ -74,9 +75,9 @@
             </thead>
             <tbody>
             <tr th:each="order : ${listOrder}">
-                <td th:text="${order.sourceCurrency}"></td> <!-- Исходная валюта -->
+                <td th:text="${order.sourceCurrency.code}"></td> <!-- Исходная валюта -->
                 <td th:text="${order.amount}"></td> <!-- Сумма -->
-                <td th:text="${order.targetCurrency}"></td> <!-- Целевая валюта -->
+                <td th:text="${order.targetCurrency.code}"></td> <!-- Целевая валюта -->
                 <td th:text="${order.price}"></td> <!-- Цена -->
                 <td th:text="${order.status}"></td> <!-- Статус -->
             </tr>

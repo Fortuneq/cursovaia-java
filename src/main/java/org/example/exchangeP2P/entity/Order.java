@@ -13,11 +13,13 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "currency_from", nullable = false)
-    private String sourceCurrency;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Currency sourceCurrency;
 
-    @Column(name = "currency_to", nullable = false)
-    private String targetCurrency;
+    @ManyToOne
+    @JoinColumn( nullable = false)
+    private Currency targetCurrency;
 
     @Column(name = "price", nullable = false)
     private double price;

@@ -18,22 +18,38 @@
   <div class="container mt-4">
     <h2>Создать ордер</h2>
     <form th:action="@{/orders}" method="POST">
+      <!-- Выбор исходной валюты -->
       <div class="mb-3">
         <label for="sourceCurrency" class="form-label">Источник (валюта)</label>
-        <input type="text" class="form-control" id="sourceCurrency" name="sourceCurrency" required>
+        <select class="form-select" id="sourceCurrency" name="sourceCurrencyId" required>
+          <option th:each="currency : ${currencies}"
+                  th:value="${currency.id}"
+                  th:text="${currency.code}"></option>
+        </select>
       </div>
+
+      <!-- Сумма -->
       <div class="mb-3">
         <label for="amount" class="form-label">Сумма</label>
         <input type="number" class="form-control" id="amount" name="amount" min="0.01" step="0.01" required>
       </div>
+
+      <!-- Выбор целевой валюты -->
       <div class="mb-3">
         <label for="targetCurrency" class="form-label">Целевая валюта</label>
-        <input type="text" class="form-control" id="targetCurrency" name="targetCurrency" required>
+        <select class="form-select" id="targetCurrency" name="targetCurrencyId" required>
+          <option th:each="currency : ${currencies}"
+                  th:value="${currency.id}"
+                  th:text="${currency.code}"></option>
+        </select>
       </div>
+
+      <!-- Цена за единицу -->
       <div class="mb-3">
         <label for="price" class="form-label">Цена За Единицу</label>
         <input type="number" class="form-control" id="price" name="price" min="0.01" step="0.01" required>
       </div>
+
       <button type="submit" class="btn btn-primary">Создать ордер</button>
     </form>
   </div>

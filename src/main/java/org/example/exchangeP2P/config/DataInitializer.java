@@ -1,7 +1,9 @@
 package org.example.exchangeP2P.config;
 
+import org.example.exchangeP2P.entity.Currency;
 import org.example.exchangeP2P.entity.Role;
 import org.example.exchangeP2P.entity.User;
+import org.example.exchangeP2P.repository.CurrencyRepository;
 import org.example.exchangeP2P.repository.RoleRepository;
 import org.example.exchangeP2P.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -16,12 +18,17 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CurrencyRepository currencyRepository;
+
+
     public DataInitializer(RoleRepository roleRepository,
                            UserRepository userRepository,
-                           PasswordEncoder passwordEncoder){
+                           PasswordEncoder passwordEncoder,
+                           CurrencyRepository currencyRepository){
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.currencyRepository = currencyRepository;
     }
     @Override
     public void run(String... args) throws Exception{
@@ -47,5 +54,19 @@ public class DataInitializer implements CommandLineRunner {
             admin.setRoles(roles);
             userRepository.save(admin);
         }
+        addCurrency("USD", "Доллар США", "$");
+        addCurrency("EUR", "Евро", "€");
+        addCurrency("RUB", "Российский рубль", "₽");
+    }
+
+
+    private void addCurrency(String code, String name, String symbol) {
+        currencyRepository.findByCode(code).orElseGet(() -> {
+            Currency currency = new Currency();
+            currency.setCode(code);
+            currency.setName(name);
+            currency.setSymbol(symbol);
+            return currencyRepository.save(currency);
+        });
     }
 }
