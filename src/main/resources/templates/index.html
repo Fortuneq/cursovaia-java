@@ -48,12 +48,13 @@
             </div>
             <div class="col-md-3">
                 <label for="sort" class="form-label">Сортировка</label>
+
                 <select id="sort" name="sort" class="form-select">
                     <option value="asc" th:selected="${sort == 'asc'}">По возрастанию</option>
                     <option value="desc" th:selected="${sort == 'desc'}">По убыванию</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div>
                 <button type="submit" class="btn btn-primary btn-filter">Применить фильтры</button>
             </div>
         </form>
@@ -67,7 +68,6 @@
                 <th>Источник</th>
                 <th>Сумма</th>
                 <th>Целевая валюта</th>
-                <th>Целевая сумма</th>
                 <th>Цена</th>
                 <th>Статус</th>
             </tr>

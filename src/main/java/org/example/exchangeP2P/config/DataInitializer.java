@@ -37,10 +37,10 @@ public class DataInitializer implements CommandLineRunner {
             return roleRepository.save(role);
         });
         // Создание администратора, если его нет
-        if(userRepository.findByUsername("DimaK").isEmpty()){
+        if(userRepository.findByUsername("Vlad").isEmpty()){
             User admin = new User();
-            admin.setUsername("DimaK");
-            admin.setPassword(passwordEncoder.encode("7301"));
+            admin.setUsername("Vlad");
+            admin.setPassword(passwordEncoder.encode("11"));
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
             roles.add(userRole);

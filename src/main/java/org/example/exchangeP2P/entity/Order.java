@@ -13,22 +13,23 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String sourceCurrency; // Исходная валюта
-
     @Column(name = "currency_from", nullable = false)
-    private double amount; // Сумма в исходной валюте
+    private String sourceCurrency;
 
     @Column(name = "currency_to", nullable = false)
-    private String targetCurrency; // Целевая валюта
+    private String targetCurrency;
+
+    @Column(name = "price", nullable = false)
+    private double price;
+
 
     @Column(name = "amount", nullable = false)
-    private double price; // Цена в целевой валюте
+    private double amount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
-    private String status = "ACTIVE"; // Статус ордера (ACTIVE, COMPLETED, CANCELLED)
+    private String status = "ACTIVE";
 }
