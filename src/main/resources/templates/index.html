@@ -35,6 +35,8 @@
                 <a th:href="@{/profile}" class="btn btn-outline-light">Профиль</a>
                 <a th:href="@{/balance}" class="btn btn-outline-light">Пополнить баланс</a>
                 <a th:href="@{/author}" class="btn btn-outline-light">Об Авторе</a>
+                <a th:href="@{/admin/users}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Управление пользователями</a>
+                <a th:href="@{/blog/admin}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Административная панель блога</a>
                 <a th:href="@{/logout}" class="btn btn-outline-light">Выйти</a>
             </div>
         </div>
