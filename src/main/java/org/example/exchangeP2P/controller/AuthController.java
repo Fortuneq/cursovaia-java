@@ -1,7 +1,10 @@
 package org.example.exchangeP2P.controller;
 
+import org.example.exchangeP2P.entity.Currency;
 import org.example.exchangeP2P.entity.Role;
 import org.example.exchangeP2P.entity.User;
+import org.example.exchangeP2P.entity.UserBalances;
+import org.example.exchangeP2P.repository.CurrencyRepository;
 import org.example.exchangeP2P.repository.RoleRepository;
 import org.example.exchangeP2P.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -24,6 +29,9 @@ public class AuthController {
     private RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private CurrencyRepository currencyRepository;
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model){
         model.addAttribute("user", new User());
@@ -51,6 +59,19 @@ public class AuthController {
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
         user.setRoles(roles);
+
+        user = userRepository.save(user);
+
+        List<Currency> currencies = currencyRepository.findAll(); // Получить список всех валют
+        Set<UserBalances> userBalances = new HashSet<>();
+        for (Currency currency : currencies) {
+            UserBalances balance = new UserBalances();
+            balance.setUser(user);
+            balance.setCurrency(currency);
+            balance.setBalance(0); // Баланс по умолчанию
+            userBalances.add(balance);
+        }
+        user.setBalances(userBalances);
         userRepository.save(user);
         return "Регистрация прошла успешно!";
     }

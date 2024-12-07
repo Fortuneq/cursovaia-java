@@ -36,8 +36,7 @@
                 <a th:href="@{/balance}" class="btn btn-outline-light">Пополнить баланс</a>
                 <a th:href="@{/author}" class="btn btn-outline-light">Об Авторе</a>
                 <a th:href="@{/admin/users}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Управление пользователями</a>
-                <a th:href="@{/admin/currencies}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Административная панель валют</a>
-                <a th:href="@{/admin/orders}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Административная панель ордеров</a>
+                <a th:href="@{/blog/admin}" class="btn btn-outline-light" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Административная панель блога</a>
                 <a th:href="@{/logout}" class="btn btn-outline-light">Выйти</a>
             </div>
         </div>
@@ -83,12 +82,6 @@
                 <td th:text="${order.targetCurrency.code}"></td> <!-- Целевая валюта -->
                 <td th:text="${order.price}"></td> <!-- Цена -->
                 <td th:text="${order.status}"></td> <!-- Статус -->
-                <td>
-                    <button class="btn btn-primary" th:if="${order.user.username != currentUsername}"
-                            th:onclick="'window.location.href=\'/orders/exchange/' + ${order.id} + '\';'">
-                        Обменять
-                    </button>
-                </td>
             </tr>
             </tbody>
         </table>

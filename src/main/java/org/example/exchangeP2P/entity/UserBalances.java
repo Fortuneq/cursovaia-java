@@ -10,6 +10,10 @@ import lombok.Setter;
 @Table(name = "user_balances")
 public class UserBalances {
 
+    public UserBalances() {
+        this.balance = 0; // Устанавливаем значение по умолчанию
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +26,7 @@ public class UserBalances {
     @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
 
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "double default 0")
     private double balance;
 
     public void addBalance(double amount) {
