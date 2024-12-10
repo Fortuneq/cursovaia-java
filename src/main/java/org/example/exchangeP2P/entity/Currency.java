@@ -14,11 +14,11 @@ public class Currency {
     private Long id;
 
     @Column(name = "code",nullable = false, unique = true)
-    private String code; // Например, "USD", "EUR", "RUB"
+    private String code;
 
     @Column(name = "name",nullable = false)
-    private String name; // Полное название валюты, например, "Доллар США"
+    private String name;
 
     @Column(name = "symbol")
-    private String symbol; // Например, "$", "€", "₽"
+    private String symbol;
 }

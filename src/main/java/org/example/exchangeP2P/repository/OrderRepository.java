@@ -22,7 +22,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(Long userId);
 
     // Найти ордера по пользователю
-    List<Order> findByUser(User user, Sort sort);
+    List<Order> findByUser(User user);
 
     @Query("SELECT o FROM Order o WHERE o.user = :user AND (o.sourceCurrency.name LIKE %:keyword% OR o.sourceCurrency.code LIKE %:keyword% OR o.targetCurrency.name LIKE %:keyword% OR o.targetCurrency.code LIKE %:keyword%)")
     List<Order> findByUserAndKeyword(@Param("user") User user, @Param("keyword") String keyword, Sort sort);

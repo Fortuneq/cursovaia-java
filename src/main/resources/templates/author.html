@@ -1,123 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>О Авторе</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
             color: #333;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 50px auto;
-            background: #fff;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
         }
 
         .header {
-            background-color: #4caf50;
+            background-color: #4e73df;
             color: white;
             padding: 20px;
             text-align: center;
             font-size: 24px;
-            font-weight: bold;
         }
 
-        .content {
-            padding: 20px;
-        }
-
-        .content h2 {
+        .table th, .table td {
             text-align: center;
-            color: #4caf50;
-            margin-bottom: 20px;
-        }
-
-        .content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .content table th,
-        .content table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .content table th {
-            background-color: #f4f4f9;
-            color: #555;
         }
 
         .footer {
-            background-color: #f4f4f9;
             text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            color: #777;
+            padding: 20px;
+            background-color: #f8f9fa;
+            margin-top: 30px;
         }
 
         .footer a {
-            color: #4caf50;
+            color: #4e73df;
             text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-
+<header class="header">О Авторе</header>
 <div class="container">
-    <div class="header">О Авторе</div>
-    <div class="content">
-        <h2>Информация</h2>
-        <table>
-            <tr>
-                <th>Имя</th>
-                <td>Владислав</td>
-            </tr>
-            <tr>
-                <th>Фамилия</th>
-                <td>Волков</td>
-            </tr>
-            <tr>
-                <th>Отчество</th>
-                <td>Юрьвеич</td>
-            </tr>
-            <tr>
-                <th>Номер группы</th>
-                <td>ПИ22-2в</td>
-            </tr>
-            <tr>
-                <th>Название проекта</th>
-                <td>Информационная система для P2P обмена валют</td>
-            </tr>
-            <tr>
-                <th>Дата сдачи</th>
-                <td>20 декабря 2024 года</td>
-            </tr>
-            <tr>
-                <th>Имя руководителя</th>
-                <td>Андропов Дмитрий</td>
-            </tr>
-        </table>
-    </div>
-    <div class="footer">
-        © 2024 Волков Владислав. Все права защищены.
-    </div>
+    <h2 class="text-center mb-4">Информация</h2>
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <th>Имя</th>
+            <td>Владислав</td>
+        </tr>
+        <tr>
+            <th>Фамилия</th>
+            <td>Волков</td>
+        </tr>
+        <tr>
+            <th>Отчество</th>
+            <td>Юрьевич</td>
+        </tr>
+        <tr>
+            <th>Номер группы</th>
+            <td>ПИ22-2в</td>
+        </tr>
+        <tr>
+            <th>Название проекта</th>
+            <td>Информационная система для P2P обмена валют</td>
+        </tr>
+        <tr>
+            <th>Дата сдачи</th>
+            <td>20 декабря 2024 года</td>
+        </tr>
+        <tr>
+            <th>Имя руководителя</th>
+            <td>Андропов Дмитрий</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
-
+<footer class="footer">
+    &copy; 2024 Волков Владислав. Все права защищены.
+</footer>
 </body>
 </html>

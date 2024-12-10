@@ -6,96 +6,123 @@ import org.example.exchangeP2P.entity.User;
 import org.example.exchangeP2P.repository.CurrencyRepository;
 import org.example.exchangeP2P.repository.OrderRepository;
 import org.example.exchangeP2P.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/orders")
 public class OrderController {
+
     private final OrderRepository orderRepository;
-
     private final CurrencyRepository currencyRepository;
-
     private final UserRepository userRepository;
 
+    @Autowired
     public OrderController(OrderRepository orderRepository, CurrencyRepository currencyRepository, UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.currencyRepository = currencyRepository;
         this.userRepository = userRepository;
     }
 
-
-    @GetMapping("/by_user")
-    public String userOrders(@RequestParam(value = "keyword", required = false) String keyword,
-                             @RequestParam(value = "sort", defaultValue = "asc") String sort,
-                             Model model) {
-
-        Sort sortOrder;
-
-        if ("desc".equals(sort)) {
-            sortOrder = Sort.by(Sort.Order.desc("price"));
-        } else {
-            sortOrder = Sort.by(Sort.Order.asc("price"));
-        }
-
+    // Получить ордера текущего пользователя
+    @GetMapping("/user")
+    public ResponseEntity<List<Order>> getUserOrders(@AuthenticationPrincipal User currentUser,
+                                                     @RequestParam(value = "keyword", required = false) String keyword,
+                                                     @RequestParam(value = "sort", defaultValue = "asc") String sort) {
+        List<Order> orders;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
 
-        // Поиск пользователя в базе данных
-        User currentUser = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден: " + currentUsername));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-
-        // Поиск ордеров пользователя с фильтром по ключевому слову (если нужно)
-        List<Order> orders;
-        if (keyword != null && !keyword.isEmpty()) {
-            orders = orderRepository.findByUserAndKeyword(currentUser, keyword, sortOrder);
-        } else {
-            orders = orderRepository.findByUser(currentUser, sortOrder);
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        model.addAttribute("listOrder", orders);
-        model.addAttribute("currentUsername", currentUsername);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("sort", sort);
-        return "user_orders";
+        String username = userDetails.getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+
+        orders = orderRepository.findByUser(user);
+
+        return ResponseEntity.ok(orders);
     }
 
 
-    @GetMapping("/create")
-    public String createOrderForm(Model model) {
-        List<Currency> currencies = currencyRepository.findAll();
-        model.addAttribute("currencies", currencies);
-        return "orders";
+    @GetMapping//массив ордеров
+    public ResponseEntity<List<Order>> getAllOrders(@AuthenticationPrincipal User currentUser,
+                                                     @RequestParam(value = "keyword", required = false) String keyword,
+                                                     @RequestParam(value = "sort", defaultValue = "asc") String sort) {
+        List<Order> orders;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        String username = userDetails.getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+        orders =  orderRepository.findAll();
+
+        return ResponseEntity.ok(orders);
     }
 
-    @PostMapping
-    public String createOrder(@AuthenticationPrincipal User user,
-                              @RequestParam Long sourceCurrencyId,
-                              @RequestParam Long targetCurrencyId,
-                              @RequestParam double amount,
-                              @RequestParam double price) {
-        Currency sourceCurrency = currencyRepository.findById(sourceCurrencyId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid source currency"));
-        Currency targetCurrency = currencyRepository.findById(targetCurrencyId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid target currency"));
 
+    @PostMapping("/create")
+    public ResponseEntity<Order> createOrder(@RequestBody Order orderRequest) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        String username = userDetails.getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+
+        // Получаем исходную валюту
+        Currency sourceCurrency = currencyRepository.findById(orderRequest.getSourceCurrency().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Неизвестная исходная валюта"));
+
+        // Получаем целевую валюту
+        Currency targetCurrency = currencyRepository.findById(orderRequest.getTargetCurrency().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Неизвестная целевая валюта"));
+
+        // Создаем новый ордер
         Order order = new Order();
         order.setUser(user);
         order.setSourceCurrency(sourceCurrency);
         order.setTargetCurrency(targetCurrency);
-        order.setAmount(amount);
-        order.setPrice(price);
+        order.setAmount(orderRequest.getAmount());
+        order.setPrice(orderRequest.getPrice());
+
+        // Сохраняем ордер в базу данных
         orderRepository.save(order);
 
-        return "redirect:/";
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+    }
+
+
+    @GetMapping("/currencies")
+    public ResponseEntity<List<Currency>> getCurrencies() {
+        List<Currency> currencies = currencyRepository.findAll();
+        return ResponseEntity.ok(currencies);
     }
 }

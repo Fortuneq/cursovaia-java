@@ -1,6 +1,7 @@
 package org.example.exchangeP2P.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +10,19 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "roles")
+@Data
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable=false, unique=true)
+
+
+    @Column(nullable = false, unique = true)
     private String name;
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
+
+
+    private String description;
+
+    public Role() {}
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,9 +16,10 @@ import javax.validation.constraints.NotBlank;
 
 @Setter
 @Getter
+@Data
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User{
     // Геттеры и сеттеры
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,59 +31,16 @@ public class User implements UserDetails {
     @Column(nullable=false)
     private String password;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<UserBalances> balances = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.EAGER)
+    /**
+     * Набор ролей, связанных с пользователем.
+     * Реализована связь многие-ко-многим с использованием таблицы связей "user_roles".
+     * Загрузка осуществляется с использованием режима {@link FetchType#EAGER}.
+     */
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name="users_roles",
-            joinColumns = @JoinColumn(name="user_id"),
-            inverseJoinColumns = @JoinColumn(name="role_id")
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<org.example.exchangeP2P.entity.Role> roles;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                .collect(Collectors.toList());
-    }
-
-    public void addFunds(Currency currency, double amount) {
-        UserBalances userBalance = getBalanceForCurrency(currency);
-        if (userBalance == null) {
-            userBalance = new UserBalances();
-            userBalance.setUser(this);
-            userBalance.setCurrency(currency);
-            userBalance.setBalance(amount);
-            balances.add(userBalance);
-        } else {
-            userBalance.addBalance(amount);
-        }
-    }
-
-
-    public UserBalances getBalanceForCurrency(Currency currency) {
-        return balances.stream()
-                .filter(userBalance -> userBalance.getCurrency().equals(currency))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    private Set<Role> roles = new HashSet<>();
 }
