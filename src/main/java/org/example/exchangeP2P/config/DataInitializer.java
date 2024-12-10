@@ -51,17 +51,17 @@ public class DataInitializer implements CommandLineRunner {
             role.setName("ADMIN");
             return roleRepository.save(role);
         });
-        // Создание администратора, если его нет
-        if(userRepository.findByUsername("Vlad").isEmpty()){
-            User admin = new User();
-            admin.setUsername("Vlad");
-            admin.setPassword(passwordEncoder.encode("11"));
-            Set<Role> roles = new HashSet<>();
-            roles.add(adminRole);
-            roles.add(userRole);
-            admin.setRoles(roles);
-            userService.save(admin);
-        }
+//        // Создание администратора, если его нет
+//        if(userRepository.findByUsername("Vlad").isEmpty()){
+//            User admin = new User();
+//            admin.setUsername("Vlad");
+//            admin.setPassword(passwordEncoder.encode("11"));
+//            Set<Role> roles = new HashSet<>();
+//            roles.add(adminRole);
+//            roles.add(userRole);
+//            admin.setRoles(roles);
+//            userService.save(admin);
+//        }
         addCurrency("USD", "Доллар США", "$");
         addCurrency("EUR", "Евро", "€");
         addCurrency("RUB", "Российский рубль", "₽");
