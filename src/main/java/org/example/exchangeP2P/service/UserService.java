@@ -27,6 +27,8 @@ public class UserService {
     /** Кодировщик паролей для защиты учетных данных. */
     private final PasswordEncoder passwordEncoder;
 
+    private final BalanceService balanceService;
+
     /**
      * Конструктор для внедрения зависимостей.
      *
@@ -34,10 +36,11 @@ public class UserService {
      * @param roleRepository репозиторий ролей.
      * @param passwordEncoder кодировщик паролей.
      */
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, BalanceService balanceService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.balanceService = balanceService;
     }
 
     /**
@@ -109,9 +112,9 @@ public class UserService {
      * @return сохраненный пользователь.
      */
     public User save(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return user;
+        User savedUser = userRepository.save(user);
+        balanceService.initializeBalances(savedUser);
+        return savedUser;
     }
 
     /**

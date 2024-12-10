@@ -107,6 +107,20 @@
         </tr>
         </tbody>
     </table>
+
+    <h3 class="text-center">Ваши балансы</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Валюта</th>
+            <th>Баланс</th>
+        </tr>
+        </thead>
+        <tbody id="balancesTable">
+        <!-- Динамическое добавление балансов -->
+        </tbody>
+    </table>
+
     <div class="actions">
         <a href="/orders/create">Создать заявку</a>
         <a href="/orders/user">Мои заявки</a>
@@ -125,7 +139,6 @@
                 throw new Error(`Ошибка загрузки профиля: ${response.status}`);
             }
             const data = await response.json();
-
             document.getElementById('userId').textContent = data.id;
             document.getElementById('username').textContent = data.username;
         } catch (error) {
@@ -133,7 +146,31 @@
         }
     }
 
+    // Функция для загрузки балансов пользователя
+    async function loadBalances() {
+        try {
+            const response = await fetch('/balances/user');
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки балансов: ${response.status}`);
+            }
+            const balances = await response.json();
+            const balancesTable = document.getElementById('balancesTable');
+            balancesTable.innerHTML = '';
+            balances.forEach(balance => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${balance.currency.name}</td>
+                    <td>${balance.amount.toFixed(2)}</td>
+                `;
+                balancesTable.appendChild(row);
+            });
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
     loadProfile();
+    loadBalances();
 </script>
 </body>
 </html>
