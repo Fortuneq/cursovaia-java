@@ -154,6 +154,8 @@
         <a href="/author">Об авторе</a>
     </nav>
     <div class="header-buttons">
+        <a href="/admin" id="adminPanelLink" style="display:none;">Админская панель</a>
+        <div></div >
         <a href="/logout">Выход</a>
     </div>
 </header>
@@ -278,8 +280,29 @@
         }
     }
 
+    async function checkUserRole() {
+        try {
+            const userResponse = await fetch('/users/currentUser');
+            if (!userResponse.ok) {
+                throw new Error('Ошибка получения данных о пользователе');
+            }
+            const user = await userResponse.json();
+
+            // Проверяем, есть ли среди ролей роль с именем "ADMIN"
+            const isAdmin = user.roles.some(role => role.name === 'ADMIN');
+
+            // Если роль пользователя ADMIN, показываем ссылку на админскую панель
+            if (isAdmin) {
+                document.getElementById('adminPanelLink').style.display = 'inline-block';
+            }
+        } catch (error) {
+            console.error('Ошибка при проверке роли пользователя:', error);
+        }
+    }
+
     // Загружаем ордера и строим график при загрузке страницы
     loadOrders();
+    checkUserRole();  // Проверка роли пользователя
 </script>
 </body>
 </html>
