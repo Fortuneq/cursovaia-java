@@ -65,4 +65,20 @@ public class AppController {
         return "add_balance";
     }
 
+    @GetMapping("/admin/edit_orders")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String serveEditOrders() {
+        return "admin_edit_orders";
+    }
+
+    @GetMapping("/admin/panel")
+    public String serveAdminPanel() {
+        return "admin_panel";
+    }
+
+    @GetMapping("/admin/list_users")
+    public String serveAdminUsersPanel() {
+        return "admin_users";
+    }
+
 }
