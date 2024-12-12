@@ -6,6 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- Подключаем шрифт из Google Fonts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Основной стиль */
@@ -164,6 +165,10 @@
     </div>
 
     <h2 class="text-center">У нас меняют</h2>
+    <div class="container">
+        <h2 class="text-center">График ордеров</h2>
+        <canvas id="ordersChart" width="400" height="200"></canvas>
+    </div>
     <table class="table text-center">
         <thead>
         <tr>
@@ -190,17 +195,51 @@
             }
             const orders = await response.json();
 
+            // Обработка ордеров для графика
+            const chartData = {
+                labels: [],  // Для хранения меток (например, валют)
+                datasets: [{
+                    label: 'Цена ордера',
+                    data: [],  // Для хранения цен ордеров
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            };
+
             // Получаем текущего пользователя
             const userResponse = await fetch('/users/currentUser');
             if (!userResponse.ok) {
-                throw new Error(`Ошибка загрузки текущего пользователя: ${userResponse.status}`);
             }
             const currentUser = await userResponse.json();
 
-            // Заполняем таблицу ордерами
+            // Заполняем данные для графика
+            orders.forEach(order => {
+                if (order.status === 'ACTIVE') {
+                    chartData.labels.push(`${order.sourceCurrency.code} -> ${order.targetCurrency.code}`);
+                    chartData.datasets[0].data.push(order.price);
+                }
+            });
+
+            // Создаем график с использованием Chart.js
+            const ctx = document.getElementById('ordersChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar', // Тип графика (столбчатый график)
+                data: chartData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+
+
+            // Заполнение таблицы ордерами
             const ordersTable = document.getElementById('ordersTable');
             ordersTable.innerHTML = '';  // Очистка предыдущих данных
-
             orders.forEach(order => {
                 if (order.status !== 'ACTIVE' || order.seller.id === currentUser.id) return;
 
@@ -239,7 +278,7 @@
         }
     }
 
-    // Загружаем ордера при загрузке страницы
+    // Загружаем ордера и строим график при загрузке страницы
     loadOrders();
 </script>
 </body>

@@ -78,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
         // Создание администратора, если его нет
         if(userRepository.findByUsername("Max").isEmpty()){
             User admin = new User();
-            admin.setUsername("Vlad");
+            admin.setUsername("Max");
             admin.setPassword(passwordEncoder.encode("11"));
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
@@ -91,7 +91,7 @@ public class DataInitializer implements CommandLineRunner {
         // Создание администратора, если его нет
         if(userRepository.findByUsername("Oleg").isEmpty()){
             User admin = new User();
-            admin.setUsername("Vlad");
+            admin.setUsername("Oleg");
             admin.setPassword(passwordEncoder.encode("11"));
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
@@ -105,7 +105,7 @@ public class DataInitializer implements CommandLineRunner {
         // Создание администратора, если его нет
         if(userRepository.findByUsername("Dima").isEmpty()){
             User admin = new User();
-            admin.setUsername("Vlad");
+            admin.setUsername("Dima");
             admin.setPassword(passwordEncoder.encode("11"));
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
@@ -119,7 +119,7 @@ public class DataInitializer implements CommandLineRunner {
         // Создание администратора, если его нет
         if(userRepository.findByUsername("Nikita").isEmpty()){
             User admin = new User();
-            admin.setUsername("Vlad");
+            admin.setUsername("Nikita");
             admin.setPassword(passwordEncoder.encode("11"));
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
