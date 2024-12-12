@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BalanceService {
@@ -35,5 +36,11 @@ public class BalanceService {
                         return balanceRepository.save(balance);
                     });
         }
+    }
+
+     public Balance GetBalance(User user,Currency currency) {
+       Optional<Balance> optBalance =  balanceRepository.findByUserAndCurrency(user,currency);
+
+       return optBalance.get();
     }
 }

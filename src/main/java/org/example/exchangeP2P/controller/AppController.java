@@ -60,4 +60,9 @@ public class AppController {
         return "user_orders";
     }
 
+    @GetMapping("/balances/add")
+    public String serveAddBalancePage() {
+        return "add_balance";
+    }
+
 }

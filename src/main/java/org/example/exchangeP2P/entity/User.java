@@ -1,5 +1,6 @@
 package org.example.exchangeP2P.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,19 +32,17 @@ public class User{
     @Column(nullable=false)
     private String password;
 
-    /**
-     * Набор ролей, связанных с пользователем.
-     * Реализована связь многие-ко-многим с использованием таблицы связей "user_roles".
-     * Загрузка осуществляется с использованием режима {@link FetchType#EAGER}.
-     */
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            name="users_roles",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="role_id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Set<org.example.exchangeP2P.entity.Role> roles;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Balance> balances = new ArrayList<>();
+
 }

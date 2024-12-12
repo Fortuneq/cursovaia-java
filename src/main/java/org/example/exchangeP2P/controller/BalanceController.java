@@ -1,6 +1,7 @@
 package org.example.exchangeP2P.controller;
 
 import org.example.exchangeP2P.entity.Balance;
+import org.example.exchangeP2P.entity.Currency;
 import org.example.exchangeP2P.entity.Order;
 import org.example.exchangeP2P.entity.User;
 import org.example.exchangeP2P.repository.BalanceRepository;
@@ -14,12 +15,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/balances")
@@ -62,5 +61,46 @@ public class BalanceController {
             }
         }
         return ResponseEntity.ok(balances);
+    }
+
+    @PostMapping("/top-up")
+    public ResponseEntity<?> topUpBalance(@AuthenticationPrincipal User currentUser, @RequestBody Map<String, Object> payload) {
+        try {
+            String currencyCode = (String) payload.get("currency");
+            Double amount = Double.valueOf(payload.get("amount").toString());
+
+            if (amount <= 0) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Сумма пополнения должна быть положительной"));
+            }
+
+            // Проверяем существование валюты
+            var currency = currencyRepository.findByCode(currencyCode)
+                    .orElseThrow(() -> new IllegalArgumentException("Валюта не найдена"));
+
+            // Получаем текущий баланс пользователя по валюте
+            var balance = balanceRepository.findByUserAndCurrency(currentUser, currency)
+                    .orElseGet(() -> {
+                        var newBalance = new Balance();
+                        newBalance.setUser(currentUser);
+                        newBalance.setCurrency(currency);
+                        newBalance.setAmount(0.0);
+                        return newBalance;
+                    });
+
+            // Обновляем баланс
+            balance.setAmount(balance.getAmount() + amount);
+            balanceRepository.save(balance);
+
+            return ResponseEntity.ok(Map.of("message", "Баланс успешно пополнен!"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/currencies")
+    public ResponseEntity<List<Currency>> getCurrencies() {
+        List<Currency> currencies = currencyRepository.findAll();
+        return ResponseEntity.ok(currencies);
     }
 }

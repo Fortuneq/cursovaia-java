@@ -1,11 +1,14 @@
 package org.example.exchangeP2P.controller;
 
+import org.example.exchangeP2P.entity.Balance;
 import org.example.exchangeP2P.entity.Currency;
 import org.example.exchangeP2P.entity.Order;
 import org.example.exchangeP2P.entity.User;
+import org.example.exchangeP2P.repository.BalanceRepository;
 import org.example.exchangeP2P.repository.CurrencyRepository;
 import org.example.exchangeP2P.repository.OrderRepository;
 import org.example.exchangeP2P.repository.UserRepository;
+import org.example.exchangeP2P.service.BalanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -27,11 +30,17 @@ public class OrderController {
     private final CurrencyRepository currencyRepository;
     private final UserRepository userRepository;
 
+    private final BalanceService balanceService;
+
+    private final BalanceRepository balanceRepository;
+
     @Autowired
-    public OrderController(OrderRepository orderRepository, CurrencyRepository currencyRepository, UserRepository userRepository) {
+    public OrderController(OrderRepository orderRepository, CurrencyRepository currencyRepository, UserRepository userRepository, BalanceService balanceService, BalanceRepository balanceRepository) {
         this.orderRepository = orderRepository;
         this.currencyRepository = currencyRepository;
         this.userRepository = userRepository;
+        this.balanceService = balanceService;
+        this.balanceRepository = balanceRepository;
     }
 
     // Получить ордера текущего пользователя
@@ -124,5 +133,46 @@ public class OrderController {
     public ResponseEntity<List<Currency>> getCurrencies() {
         List<Currency> currencies = currencyRepository.findAll();
         return ResponseEntity.ok(currencies);
+    }
+
+    @PostMapping("/exchange/{orderId}")
+    public ResponseEntity<?> exchangeOrder(@PathVariable Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Пользователь не авторизован");
+        }
+
+        String username = userDetails.getUsername();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Ордер не найден"));
+
+        // Проверка на статус и владельца ордера
+        if (!"ACTIVE".equals(order.getStatus())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ордер не активен");
+        }
+
+        if (order.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Невозможно обменять свой ордер");
+        }
+
+        if (balanceService.GetBalance(currentUser, order.getSourceCurrency()).getAmount() < order.getAmount()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Недостаточный баланс");
+        }
+
+
+        // Логика обмена (пример)
+        // Здесь вы можете добавить обработку обмена, перевод балансов и изменение статуса ордера
+
+
+
+        order.setStatus("DONE");
+        orderRepository.save(order);
+
+        return ResponseEntity.ok("Ордер успешно обменян");
     }
 }

@@ -149,6 +149,7 @@
         <a href="/orders/create">Создать заявку на обмен</a>
         <a href="/profile">Профиль</a>
         <a href="/orders/by_user">Мои заявки</a>
+        <a href="/balances/add">Пополнить баланс</a>
         <a href="/author">Об авторе</a>
     </nav>
     <div class="header-buttons">
@@ -189,11 +190,20 @@
             }
             const orders = await response.json();
 
+            // Получаем текущего пользователя
+            const userResponse = await fetch('/users/currentUser');
+            if (!userResponse.ok) {
+                throw new Error(`Ошибка загрузки текущего пользователя: ${userResponse.status}`);
+            }
+            const currentUser = await userResponse.json();
+
             // Заполняем таблицу ордерами
             const ordersTable = document.getElementById('ordersTable');
             ordersTable.innerHTML = '';  // Очистка предыдущих данных
 
             orders.forEach(order => {
+                if (order.status !== 'ACTIVE' || order.user.id === currentUser.id) return;
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${order.id}</td>
@@ -201,11 +211,31 @@
                     <td>${order.targetCurrency.code}</td>
                     <td>${order.amount}</td>
                     <td>${order.price}</td>
+                    <td>
+                        <button class="btn btn-success" onclick="exchangeOrder(${order.id})">Обменять</button>
+                    </td>
                 `;
                 ordersTable.appendChild(row);
             });
         } catch (error) {
+            console.error(error);
             alert(error.message);
+        }
+    }
+
+    async function exchangeOrder(orderId) {
+        try {
+            const response = await fetch(`/orders/exchange/${orderId}`, { method: 'POST' });
+            if (response.ok) {
+                alert('Ордер успешно обменян!');
+                loadOrders(); // Обновляем список
+            } else {
+                const errorData = await response.json();
+                alert(`Ошибка обмена: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Не удалось выполнить обмен');
         }
     }
 
