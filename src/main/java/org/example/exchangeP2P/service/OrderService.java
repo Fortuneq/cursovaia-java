@@ -19,9 +19,6 @@ public class OrderService {
 
 
     public List<Order> listAll(String keyword) {
-        if (keyword != null) {
-            return orderRepository.search(keyword);
-        }
         return orderRepository.findAll();
     }
     public Order createOrder(Order order) {

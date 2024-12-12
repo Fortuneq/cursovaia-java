@@ -74,6 +74,61 @@ public class DataInitializer implements CommandLineRunner {
             balanceService.initializeBalances(admin);
         }
 
+
+        // Создание администратора, если его нет
+        if(userRepository.findByUsername("Max").isEmpty()){
+            User admin = new User();
+            admin.setUsername("Vlad");
+            admin.setPassword(passwordEncoder.encode("11"));
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+            roles.add(userRole);
+            admin.setRoles(roles);
+            userRepository.save(admin);
+            balanceService.initializeBalances(admin);
+        }
+
+        // Создание администратора, если его нет
+        if(userRepository.findByUsername("Oleg").isEmpty()){
+            User admin = new User();
+            admin.setUsername("Vlad");
+            admin.setPassword(passwordEncoder.encode("11"));
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+            roles.add(userRole);
+            admin.setRoles(roles);
+            userRepository.save(admin);
+            balanceService.initializeBalances(admin);
+        }
+
+
+        // Создание администратора, если его нет
+        if(userRepository.findByUsername("Dima").isEmpty()){
+            User admin = new User();
+            admin.setUsername("Vlad");
+            admin.setPassword(passwordEncoder.encode("11"));
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+            roles.add(userRole);
+            admin.setRoles(roles);
+            userRepository.save(admin);
+            balanceService.initializeBalances(admin);
+        }
+
+
+        // Создание администратора, если его нет
+        if(userRepository.findByUsername("Nikita").isEmpty()){
+            User admin = new User();
+            admin.setUsername("Vlad");
+            admin.setPassword(passwordEncoder.encode("11"));
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+            roles.add(userRole);
+            admin.setRoles(roles);
+            userRepository.save(admin);
+            balanceService.initializeBalances(admin);
+        }
+
     }
 
 

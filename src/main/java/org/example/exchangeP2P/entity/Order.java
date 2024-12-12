@@ -29,8 +29,13 @@ public class Order {
     private double amount;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "seller_id", nullable = false)
+    private User seller;
+
+    @ManyToOne
+    @JoinColumn(name = "buyer_id", nullable = true)
+    private User buyer;
+
 
     @Column(nullable = false)
     private String status = "ACTIVE";

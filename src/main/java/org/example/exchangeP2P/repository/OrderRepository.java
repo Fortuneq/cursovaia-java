@@ -12,19 +12,11 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Query("SELECT o FROM Order o WHERE " +
-            "LOWER(o.sourceCurrency.code) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(o.targetCurrency.code) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(o.status) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Order> search(String keyword);
 
+    List<Order> findByBuyerOrSeller(User buyer,User seller );
 
-    List<Order> findByUserId(Long userId);
-
-    // Найти ордера по пользователю
-    List<Order> findByUser(User user);
-
-    @Query("SELECT o FROM Order o WHERE o.user = :user AND (o.sourceCurrency.name LIKE %:keyword% OR o.sourceCurrency.code LIKE %:keyword% OR o.targetCurrency.name LIKE %:keyword% OR o.targetCurrency.code LIKE %:keyword%)")
+    @Query("SELECT o FROM Order o WHERE ( o.buyer = :user OR  o.seller = :user) AND (o.sourceCurrency.name LIKE %:keyword% OR o.sourceCurrency.code LIKE %:keyword% OR o.targetCurrency.name LIKE %:keyword% OR o.targetCurrency.code LIKE %:keyword%)")
     List<Order> findByUserAndKeyword(@Param("user") User user, @Param("keyword") String keyword, Sort sort);
+
 }
 

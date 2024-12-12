@@ -74,15 +74,22 @@
                                type="password"/>
                         <span id='message'></span>
                     </div>
-                    <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
+                    <button id="submitButton" class="btn btn-primary" type="submit" disabled>Зарегистрироваться</button>
                     <script type="text/javascript">
                         var check = function () {
-                            if (document.getElementById('passwordRegister').value === document.getElementById('confirmPasswordRegister').value) {
-                                document.getElementById('message').style.color = 'green';
-                                document.getElementById('message').innerHTML = 'Совпадают';
+                            var password = document.getElementById('passwordRegister').value;
+                            var confirmPassword = document.getElementById('confirmPasswordRegister').value;
+                            var message = document.getElementById('message');
+                            var submitButton = document.getElementById('submitButton');
+
+                            if (password === confirmPassword) {
+                                message.style.color = 'green';
+                                message.innerHTML = 'Совпадают';
+                                submitButton.disabled = false;  // Активировать кнопку
                             } else {
-                                document.getElementById('message').style.color = 'red';
-                                document.getElementById('message').innerHTML = 'Не совпадают';
+                                message.style.color = 'red';
+                                message.innerHTML = 'Не совпадают';
+                                submitButton.disabled = true;   // Деактивировать кнопку
                             }
                         }
                     </script>

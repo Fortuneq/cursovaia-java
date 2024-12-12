@@ -202,7 +202,7 @@
             ordersTable.innerHTML = '';  // Очистка предыдущих данных
 
             orders.forEach(order => {
-                if (order.status !== 'ACTIVE' || order.user.id === currentUser.id) return;
+                if (order.status !== 'ACTIVE' || order.seller.id === currentUser.id) return;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `

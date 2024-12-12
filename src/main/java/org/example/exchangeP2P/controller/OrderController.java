@@ -62,7 +62,7 @@ public class OrderController {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
 
-        orders = orderRepository.findByUser(user);
+        orders = orderRepository.findByBuyerOrSeller(user,user);
 
         return ResponseEntity.ok(orders);
     }
@@ -116,7 +116,7 @@ public class OrderController {
 
         // Создаем новый ордер
         Order order = new Order();
-        order.setUser(user);
+        order.setSeller(user);
         order.setSourceCurrency(sourceCurrency);
         order.setTargetCurrency(targetCurrency);
         order.setAmount(orderRequest.getAmount());
@@ -156,7 +156,7 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ордер не активен");
         }
 
-        if (order.getUser().getId().equals(currentUser.getId())) {
+        if (order.getSeller().getId().equals(currentUser.getId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Невозможно обменять свой ордер");
         }
 
@@ -168,7 +168,7 @@ public class OrderController {
         }
 
         // Получение баланса второго пользователя, с которым происходит обмен
-        User ownerUser = order.getUser();
+        User ownerUser = order.getSeller();
         Balance ownerBalance = balanceService.GetBalance(ownerUser, order.getTargetCurrency());
 
         if (ownerBalance.getAmount() < order.getAmount() * order.getPrice()) {
@@ -197,6 +197,7 @@ public class OrderController {
 
 
         order.setStatus("DONE");
+        order.setBuyer(currentUser);
         orderRepository.save(order);
 
         return ResponseEntity.ok("Ордер успешно обменян");
