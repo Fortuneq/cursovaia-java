@@ -160,13 +160,39 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Невозможно обменять свой ордер");
         }
 
-        if (balanceService.GetBalance(currentUser, order.getSourceCurrency()).getAmount() < order.getAmount()){
+
+        // Проверка наличия средств на балансе
+        Balance userBalance = balanceService.GetBalance(currentUser, order.getSourceCurrency());
+        if (userBalance.getAmount() < order.getAmount()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Недостаточный баланс");
         }
 
+        // Получение баланса второго пользователя, с которым происходит обмен
+        User ownerUser = order.getUser();
+        Balance ownerBalance = balanceService.GetBalance(ownerUser, order.getTargetCurrency());
 
-        // Логика обмена (пример)
-        // Здесь вы можете добавить обработку обмена, перевод балансов и изменение статуса ордера
+        if (ownerBalance.getAmount() < order.getAmount() * order.getPrice()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("У владельца ордера недостаточно средств для обмена");
+        }
+
+        // Перерасчёт валют
+        double exchangedAmount = order.getAmount() * order.getPrice(); // Переводим с учётом курса
+        userBalance.setAmount(userBalance.getAmount() - order.getAmount());
+        ownerBalance.setAmount(ownerBalance.getAmount() - exchangedAmount);
+
+        // Обновляем балансы обоих пользователей
+        balanceRepository.save(userBalance);
+        balanceRepository.save(ownerBalance);
+
+        // Переводим валюту на баланс владельца ордера
+        Balance targetUserBalance = balanceService.GetBalance(currentUser, order.getTargetCurrency());
+        targetUserBalance.setAmount(targetUserBalance.getAmount() + exchangedAmount);
+        balanceRepository.save(targetUserBalance);
+
+        // Переводим исходную валюту на баланс пользователя, принимающего ордер
+        Balance sourceOwnerBalance = balanceService.GetBalance(ownerUser, order.getSourceCurrency());
+        sourceOwnerBalance.setAmount(sourceOwnerBalance.getAmount() + order.getAmount());
+        balanceRepository.save(sourceOwnerBalance);
 
 
 

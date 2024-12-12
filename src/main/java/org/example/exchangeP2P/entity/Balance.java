@@ -17,7 +17,7 @@ public class Balance {
     @JsonIgnore
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "currency_id", nullable = false)
     private Currency currency;
 

@@ -40,9 +40,8 @@ public class BalanceController {
 
     // Получить ордера текущего пользователя
     @GetMapping("/user")
-    public ResponseEntity<List<Balance>> getUserBalances(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<Balance>> getUserBalances() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if (userDetails == null) {
@@ -50,31 +49,40 @@ public class BalanceController {
         }
 
         String username = userDetails.getUsername();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
 
-        List<Balance> balances = balanceRepository.findByUser(user);
+        List<Balance> balances = balanceRepository.findByUser(currentUser);
 
-        for (Balance balance:balances){
-            if( balance==null ){
-
-            }
-        }
         return ResponseEntity.ok(balances);
     }
 
     @PostMapping("/top-up")
-    public ResponseEntity<?> topUpBalance(@AuthenticationPrincipal User currentUser, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> topUpBalance(@RequestBody Map<String, Object> payload) {
         try {
-            String currencyCode = (String) payload.get("currency");
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Пользователь не авторизован");
+            }
+
+            String username = userDetails.getUsername();
+            User currentUser = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+            String currencyCode = (String)  payload.get("currency");
             Double amount = Double.valueOf(payload.get("amount").toString());
 
             if (amount <= 0) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Сумма пополнения должна быть положительной"));
             }
+            Long currencyId = Long.parseLong(currencyCode);
+
 
             // Проверяем существование валюты
-            var currency = currencyRepository.findByCode(currencyCode)
+            var currency = currencyRepository.findById(currencyId)
                     .orElseThrow(() -> new IllegalArgumentException("Валюта не найдена"));
 
             // Получаем текущий баланс пользователя по валюте
