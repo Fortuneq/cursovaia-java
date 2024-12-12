@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
@@ -92,7 +93,7 @@ public class OrderController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<Order> createOrder(@RequestBody Order orderRequest) {
+    public ResponseEntity<?> createOrder(@RequestBody Order orderRequest) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -113,6 +114,21 @@ public class OrderController {
         // Получаем целевую валюту
         Currency targetCurrency = currencyRepository.findById(orderRequest.getTargetCurrency().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Неизвестная целевая валюта"));
+
+        Balance userBalance = balanceService.GetBalance(user, sourceCurrency);
+        if (userBalance.getAmount() < orderRequest.getAmount()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "error", "Недостаточно средств",
+                    "availableBalance", userBalance.getAmount(),
+                    "requiredAmount", orderRequest.getAmount()
+            ));
+        }
+
+        if (sourceCurrency == targetCurrency){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "error", "Нельзя обменть валюту на ту же"
+            ));
+        }
 
         // Создаем новый ордер
         Order order = new Order();
