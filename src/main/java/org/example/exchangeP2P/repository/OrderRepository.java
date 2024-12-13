@@ -18,5 +18,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE ( o.buyer = :user OR  o.seller = :user) AND (o.sourceCurrency.name LIKE %:keyword% OR o.sourceCurrency.code LIKE %:keyword% OR o.targetCurrency.name LIKE %:keyword% OR o.targetCurrency.code LIKE %:keyword%)")
     List<Order> findByUserAndKeyword(@Param("user") User user, @Param("keyword") String keyword, Sort sort);
 
+    @Query("SELECT o FROM Order o WHERE " +
+            "LOWER(o.sourceCurrency.code) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(o.targetCurrency.code) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(o.status) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Order> searchOrders(@Param("keyword") String keyword, Sort sort);
+
 }
 

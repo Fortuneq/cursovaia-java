@@ -167,6 +167,26 @@
     </div>
 
     <h2 class="text-center">У нас меняют</h2>
+    <div class="filters container">
+        <h4>Фильтрация ордеров</h4>
+        <form class="row" th:action="@{/orders}" method="GET">
+            <div class="col-md-3">
+                <label for="keyword" class="form-label">Поиск</label>
+                <input type="text" id="keyword" name="keyword" class="form-control" th:value="${keyword}" placeholder="Введите валюту или статус">
+            </div>
+            <div class="col-md-3">
+                <label for="sort" class="form-label">Сортировка</label>
+                <select id="sort" name="sort" class="form-select">
+                    <option value="asc" th:selected="${sort == 'asc'}">По возрастанию</option>
+                    <option value="desc" th:selected="${sort == 'desc'}">По убыванию</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary btn-filter">Применить фильтры</button>
+            </div>
+        </form>
+    </div>
+
     <div class="container">
         <h2 class="text-center">График ордеров</h2>
         <canvas id="ordersChart" width="400" height="200"></canvas>

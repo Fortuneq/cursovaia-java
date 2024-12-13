@@ -9,6 +9,7 @@ import org.example.exchangeP2P.repository.CurrencyRepository;
 import org.example.exchangeP2P.repository.OrderRepository;
 import org.example.exchangeP2P.repository.UserRepository;
 import org.example.exchangeP2P.service.BalanceService;
+import org.example.exchangeP2P.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,14 +36,16 @@ public class OrderController {
     private final BalanceService balanceService;
 
     private final BalanceRepository balanceRepository;
+    private final OrderService orderService;
 
     @Autowired
-    public OrderController(OrderRepository orderRepository, CurrencyRepository currencyRepository, UserRepository userRepository, BalanceService balanceService, BalanceRepository balanceRepository) {
+    public OrderController(OrderRepository orderRepository, CurrencyRepository currencyRepository, UserRepository userRepository, BalanceService balanceService, BalanceRepository balanceRepository, OrderService orderService) {
         this.orderRepository = orderRepository;
         this.currencyRepository = currencyRepository;
         this.userRepository = userRepository;
         this.balanceService = balanceService;
         this.balanceRepository = balanceRepository;
+        this.orderService = orderService;
     }
 
     // Получить ордера текущего пользователя
@@ -70,10 +74,19 @@ public class OrderController {
 
 
     @GetMapping//массив ордеров
-    public ResponseEntity<List<Order>> getAllOrders(@AuthenticationPrincipal User currentUser,
-                                                     @RequestParam(value = "keyword", required = false) String keyword,
-                                                     @RequestParam(value = "sort", defaultValue = "asc") String sort) {
+    public ResponseEntity<List<Order>> getAllOrders(@RequestParam(value = "keyword", required = false) String keyword,
+                                                    @RequestParam(value = "sort", defaultValue = "asc") String sort,
+                                                    Model model)  {
         List<Order> orders;
+
+        Sort sortOrder;
+
+        if ("desc".equals(sort)) {
+            sortOrder = Sort.by(Sort.Order.desc("price"));
+        } else {
+            sortOrder = Sort.by(Sort.Order.asc("price"));
+        }
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -86,7 +99,19 @@ public class OrderController {
         String username = userDetails.getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
-        orders =  orderRepository.findAll();
+
+
+        if (keyword != null && !keyword.isEmpty()) {
+            orders = orderRepository.findByUserAndKeyword(user, keyword, sortOrder);
+        } else  {
+            orders = orderRepository.findAll(sortOrder);
+        }
+
+
+        // Передаем данные в модель
+        model.addAttribute("listOrder", orders);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sort", sort);
 
         return ResponseEntity.ok(orders);
     }

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление валютами</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #4e73df;
+            color: white;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+        }
+
+        .container {
+            margin-top: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background-color: #f4f5f7;
+            color: #333;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .form-inline {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <h1>Управление валютами</h1>
+    <a href="/admin/panel">Админ-панель</a>
+</header>
+
+<div class="container">
+    <h2 class="text-center">Список валют</h2>
+
+    <!-- Форма для добавления валюты -->
+    <form id="currencyForm" class="form-inline">
+        <input type="text" id="currencyCode" class="form-control" placeholder="Код валюты (например, USD)" required>
+        <input type="text" id="currencyName" class="form-control" placeholder="Название валюты (например, Доллар)" required>
+        <input type="text" id="currencySymbol" class="form-control" placeholder="Символ ($)">
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+
+    <!-- Таблица валют -->
+    <table class="table text-center">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Код</th>
+            <th>Название</th>
+            <th>Символ</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody id="currenciesTable">
+        <!-- Динамически добавляем валюты -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Загрузка списка валют
+    async function loadCurrencies() {
+        try {
+            const response = await fetch('/admin/currencies');
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки валют: ${response.status}`);
+            }
+            const currencies = await response.json();
+            const currenciesTable = document.getElementById('currenciesTable');
+            currenciesTable.innerHTML = '';
+            currencies.forEach(currency => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${currency.id}</td>
+                    <td>${currency.code}</td>
+                    <td>${currency.name}</td>
+                    <td>${currency.symbol || '—'}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCurrency(${currency.id})">Удалить</button>
+                    </td>
+                `;
+                currenciesTable.appendChild(row);
+            });
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // Удаление валюты
+    async function deleteCurrency(currencyId) {
+        try {
+            const response = await fetch(`/admin/currencies/${currencyId}`, { method: 'DELETE' });
+            if (!response.ok) {
+                throw new Error(`Ошибка удаления валюты: ${response.status}`);
+            }
+            alert('Валюта удалена');
+            loadCurrencies();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // Добавление валюты
+    document.getElementById('currencyForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const code = document.getElementById('currencyCode').value;
+        const name = document.getElementById('currencyName').value;
+        const symbol = document.getElementById('currencySymbol').value;
+
+        try {
+            const response = await fetch('/admin/currencies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, name, symbol })
+            });
+            if (!response.ok) {
+                throw new Error(`Ошибка добавления валюты: ${response.status}`);
+            }
+            alert('Валюта добавлена');
+            document.getElementById('currencyForm').reset();
+            loadCurrencies();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // Загружаем валюты при загрузке страницы
+    document.addEventListener('DOMContentLoaded', loadCurrencies);
+</script>
+</body>
+</html>

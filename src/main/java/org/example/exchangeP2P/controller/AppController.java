@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 
 @Controller
@@ -34,8 +37,20 @@ public class AppController {
 
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String registerUser(@ModelAttribute("user") User user) {
-        userService.registerUser(user, "USER");
+    public String registerUser(@ModelAttribute("user") @Valid User user,
+                               BindingResult bindingResult,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errors", bindingResult.getAllErrors());
+            return "login";
+        }
+
+        try {
+            userService.registerUser(user, "USER");
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Ошибка регистрации: " + e.getMessage());
+            return "login";
+        }
         return "redirect:/login";
     }
 
@@ -79,6 +94,16 @@ public class AppController {
     @GetMapping("/admin/list_users")
     public String serveAdminUsersPanel() {
         return "admin_users";
+    }
+
+    @GetMapping("/admin/list_orders")
+    public String serveAdminListOrdersPanel() {
+        return "admin_orders";
+    }
+
+    @GetMapping("/admin/list_currencies")
+    public String serveAdminListCurrenciesPanel() {
+        return "admin_currency";
     }
 
 }

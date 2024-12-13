@@ -11,6 +11,7 @@ import org.example.exchangeP2P.repository.RoleRepository;
 import org.example.exchangeP2P.repository.UserRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,17 +37,33 @@ public class UserService {
     }
 
     public User registerUser(User user, String roleName) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role selectedRole = roleRepository.findByName(roleName).orElseThrow();
-        selectedRole = roleRepository.saveAndFlush(selectedRole); // Обеспечивает связь с текущим контекстом
-        Set<Role> roles = new HashSet<>();
-        roles.add(selectedRole);
-        user.setRoles(roles);
+        try {
 
-        user =  userRepository.save(user);
-        balanceService.initializeBalances(user);
-        return user;
-    }
+            if (userRepository.existsByUsername(user.getUsername())) {
+                throw new IllegalArgumentException("Пользователь с таким ником уже существует");
+            }
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            Role selectedRole = roleRepository.findByName(roleName).orElseThrow();
+            selectedRole = roleRepository.saveAndFlush(selectedRole); // Обеспечивает связь с текущим контекстом
+            Set<Role> roles = new HashSet<>();
+            roles.add(selectedRole);
+            user.setRoles(roles);
+
+
+            user = userRepository.save(user);
+            balanceService.initializeBalances(user);
+            return user;
+        }catch (IllegalArgumentException e) {
+        // Логирование ошибки и выброс исключения
+        throw new RuntimeException(e.getMessage());
+    } catch (DataIntegrityViolationException e) {
+        // Ловим ошибку нарушенной уникальности
+        throw new RuntimeException("Ошибка при регистрации: возможно, дублируется имя пользователя.");
+    } catch (Exception e) {
+        // Ловим все остальные ошибки
+        throw new RuntimeException("Произошла ошибка при регистрации: " + e.getMessage());
+    }}
+
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Пользователь не найден."));
     }

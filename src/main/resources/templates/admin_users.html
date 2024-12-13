@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <title>Управление пользователями</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f8f9fa;
             margin: 0;
             padding: 0;
@@ -30,7 +29,7 @@
 
         .container {
             margin-top: 30px;
-            max-width: 1200px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -50,28 +49,40 @@
             background-color: #f1f1f1;
         }
 
-        .table td {
-            padding: 15px;
+        .form-inline {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            margin-left: 5px;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <header class="header">
     <h1>Управление пользователями</h1>
-    <a href="/admin">Назад в админ-панель</a>
+    <a href="/admin/panel">Админ-панель</a>
 </header>
 
 <div class="container">
     <h2 class="text-center">Список пользователей</h2>
 
+    <!-- Форма для добавления пользователя -->
+    <form id="userForm" class="form-inline">
+        <input type="text" id="username" class="form-control" placeholder="Имя пользователя" required>
+        <input type="password" id="password" class="form-control" placeholder="Пароль" required>
+        <button type="submit" class="btn btn-primary">Добавить пользователя</button>
+    </form>
+
+    <!-- Таблица пользователей -->
     <table class="table text-center">
         <thead>
         <tr>
             <th>ID</th>
             <th>Имя пользователя</th>
             <th>Роли</th>
-            <th>Баланс</th>
             <th>Действия</th>
         </tr>
         </thead>
@@ -92,18 +103,15 @@
             const users = await response.json();
             const usersTable = document.getElementById('usersTable');
             usersTable.innerHTML = '';
-
             users.forEach(user => {
-                const roles = user.roles.map(role => role.name).join(', ');
-                const balances = user.balances.map(balance => `${balance.currency.code}: ${balance.amount}`).join('<br>');
-
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${user.id}</td>
                     <td>${user.username}</td>
-                    <td>${roles}</td>
-                    <td>${balances}</td>
+                    <td>${user.roles.map(role => role.name).join(', ')}</td>
                     <td>
+                        <button class="btn btn-success btn-sm" onclick="makeAdmin(${user.id})">Сделать админом</button>
+                        <button class="btn btn-danger btn-sm" onclick="removeAdmin(${user.id})">Убрать админа</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Удалить</button>
                     </td>
                 `;
@@ -114,23 +122,70 @@
         }
     }
 
-    // Функция удаления пользователя
+    // Удаление пользователя
     async function deleteUser(userId) {
-        if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) return;
-
         try {
-            const response = await fetch(`/admin/users/${userId}`, {
-                method: 'DELETE'
-            });
+            const response = await fetch(`/admin/users/${userId}`, { method: 'DELETE' });
             if (!response.ok) {
                 throw new Error(`Ошибка удаления пользователя: ${response.status}`);
             }
-            alert('Пользователь удалён успешно');
+            alert('Пользователь удален');
             loadUsers();
         } catch (error) {
             alert(error.message);
         }
     }
+
+    // Назначить пользователя администратором
+    async function makeAdmin(userId) {
+        try {
+            const response = await fetch(`/admin/users/${userId}/make-admin`, { method: 'POST' });
+            if (!response.ok) {
+                throw new Error(`Ошибка назначения администратора: ${response.status}`);
+            }
+            alert('Пользователь стал администратором');
+            loadUsers();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // Убрать пользователя с прав администратора
+    async function removeAdmin(userId) {
+        try {
+            const response = await fetch(`/admin/users/${userId}/remove-admin`, { method: 'POST' });
+            if (!response.ok) {
+                throw new Error(`Ошибка снятия прав администратора: ${response.status}`);
+            }
+            alert('Права администратора сняты');
+            loadUsers();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // Добавление пользователя
+    document.getElementById('userForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('/admin/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            if (!response.ok) {
+                throw new Error(`Ошибка добавления пользователя: ${response.status}`);
+            }
+            alert('Пользователь добавлен');
+            document.getElementById('userForm').reset();
+            loadUsers();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
 
     // Загружаем пользователей при загрузке страницы
     document.addEventListener('DOMContentLoaded', loadUsers);
