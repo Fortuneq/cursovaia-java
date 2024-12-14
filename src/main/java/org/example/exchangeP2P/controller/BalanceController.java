@@ -38,7 +38,7 @@ public class BalanceController {
         this.balanceRepository = balanceRepository;
     }
 
-    // Получить ордера текущего пользователя
+    // Получить заявки текущего пользователя
     @GetMapping("/user")
     public ResponseEntity<List<Balance>> getUserBalances() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

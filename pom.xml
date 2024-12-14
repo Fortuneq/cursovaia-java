@@ -11,10 +11,10 @@
 	</parent>
 
 	<groupId>org.example</groupId>
-	<artifactId>Cargo29</artifactId>
+	<artifactId>Cursovaia</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Cargo29</name>
-	<description>Cargo29</description>
+	<name>Cursovaia</name>
+	<description>Cursovaia</description>
 	<url/>
 
 	<licenses>

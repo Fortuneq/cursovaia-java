@@ -42,7 +42,7 @@ public class AdminController {
         this.roleRepository = roleRepository;
     }
 
-    @GetMapping("/orders")//массив ордеров
+    @GetMapping("/orders")//массив заявок
     public ResponseEntity<List<Order>> getAllOrders(@AuthenticationPrincipal User currentUser,
                                                     @RequestParam(value = "keyword", required = false) String keyword,
                                                     @RequestParam(value = "sort", defaultValue = "asc") String sort) {
@@ -75,10 +75,10 @@ public class AdminController {
 
     @PostMapping("/orders/{orderId}/{action}")
     public ResponseEntity<String> toggleOrderStatus(@PathVariable Long orderId, @PathVariable String action) {
-        // Проверяем, существует ли ордер
+        // Проверяем, существует ли заявка
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ордер не найден");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Заявка не найдена");
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -115,7 +115,7 @@ public class AdminController {
         // Сохраняем изменения
         orderRepository.save(order);
 
-        return ResponseEntity.ok("Статус ордера обновлен");
+        return ResponseEntity.ok("Статус заявки обновлен");
     }
 
 

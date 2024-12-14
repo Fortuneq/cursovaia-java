@@ -29,10 +29,22 @@ public class AppController {
     }
 
     @RequestMapping("/login")
-    public String showLoginForm(Model model) {
+    public String showLoginForm(@RequestParam(value = "error", required = false) String error,
+                                Model model) {
+
+        if (error != null) {
+            model.addAttribute("errorMessage", "Неверные учетные данные. Пожалуйста, попробуйте снова.");
+        }
         User user = new User();
         model.addAttribute("user", user);
         return "login";
+    }
+
+    @RequestMapping("/register")
+    public String showRegisterForm(Model model) {
+        User user = new User();
+        model.addAttribute("user", user); // Передает новый объект User
+        return "register"; // Возвращает register.html
     }
 
 
@@ -42,14 +54,14 @@ public class AppController {
                                Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("errors", bindingResult.getAllErrors());
-            return "login";
+            return "register";
         }
 
         try {
             userService.registerUser(user, "USER");
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Ошибка регистрации: " + e.getMessage());
-            return "login";
+            return "register";
         }
         return "redirect:/login";
     }

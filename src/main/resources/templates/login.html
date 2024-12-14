@@ -2,7 +2,7 @@
 <html lang="ru" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Сервис P2P обмена валюты</title>
+    <title>Вход в сервис</title>
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
     <style>
@@ -24,12 +24,17 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-
 <body>
 <div class="container-wrapper">
     <blockquote class="blockquote text-center">
-        <h1>Сервис P2P обмена валюты</h1>
+        <h1>Сервис внебиржевого обмена валюты</h1>
         <h2 class="mt-5">Вход</h2>
+
+        <!-- Блок для отображения ошибки -->
+        <div th:if="${errorMessage}" class="alert alert-danger mt-4" role="alert">
+            <p th:text="${errorMessage}">Сообщение об ошибке</p>
+        </div>
+
         <div class="container">
             <form class="form-group mt-4" method="post" th:action="@{/login}">
                 <div class="mb-3 form-group">
@@ -43,60 +48,8 @@
                 <button class="btn btn-primary" type="submit">Войти</button>
             </form>
         </div>
-        <button class="btn btn-outline-primary mt-3" data-bs-target="#addUserModal" data-bs-toggle="modal"
-                type="button">Зарегистрироваться
-        </button>
+        <a href="/register" class="btn btn-outline-primary mt-3">Зарегистрироваться</a>
     </blockquote>
-</div>
-
-<!-- Модальное окно для регистрации -->
-<div aria-hidden="true" aria-labelledby="addUserModalLabel" class="modal fade" id="addUserModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addUserModalLabel">Регистрация</h5>
-                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addUserForm" method="post" th:action="@{/register}" th:object="${user}">
-                    <div class="mb-3">
-                        <label for="usernameRegister">Ник пользователя*</label>
-                        <input class="form-control" id="usernameRegister" required th:field="*{username}" type="text"/>
-                    </div>
-                    <div class="mb-3">
-                        <label for="passwordRegister">Пароль*</label>
-                        <input class="form-control" id="passwordRegister" required th:field="*{password}"
-                               type="password"/>
-                    </div>
-                    <div class="mb-3">
-                        <label for="confirmPasswordRegister">Подтверждение пароля*</label>
-                        <input class="form-control" id="confirmPasswordRegister" onkeyup='check();' required
-                               type="password"/>
-                        <span id='message'></span>
-                    </div>
-                    <button id="submitButton" class="btn btn-primary" type="submit" disabled>Зарегистрироваться</button>
-                    <script type="text/javascript">
-                        var check = function () {
-                            var password = document.getElementById('passwordRegister').value;
-                            var confirmPassword = document.getElementById('confirmPasswordRegister').value;
-                            var message = document.getElementById('message');
-                            var submitButton = document.getElementById('submitButton');
-
-                            if (password === confirmPassword) {
-                                message.style.color = 'green';
-                                message.innerHTML = 'Совпадают';
-                                submitButton.disabled = false;  // Активировать кнопку
-                            } else {
-                                message.style.color = 'red';
-                                message.innerHTML = 'Не совпадают';
-                                submitButton.disabled = true;   // Деактивировать кнопку
-                            }
-                        }
-                    </script>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 </body>
 </html>

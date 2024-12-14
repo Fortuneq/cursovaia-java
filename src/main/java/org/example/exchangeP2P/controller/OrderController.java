@@ -48,7 +48,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // Получить ордера текущего пользователя
+    // Получить заявки текущего пользователя
     @GetMapping("/user")
     public ResponseEntity<List<Order>> getUserOrders(@AuthenticationPrincipal User currentUser,
                                                      @RequestParam(value = "keyword", required = false) String keyword,
@@ -73,7 +73,7 @@ public class OrderController {
     }
 
 
-    @GetMapping//массив ордеров
+    @GetMapping//массив заявок
     public ResponseEntity<List<Order>> getAllOrders(@RequestParam(value = "keyword", required = false) String keyword,
                                                     @RequestParam(value = "sort", defaultValue = "asc") String sort,
                                                     Model model)  {
@@ -102,7 +102,7 @@ public class OrderController {
 
 
         if (keyword != null && !keyword.isEmpty()) {
-            orders = orderRepository.findByUserAndKeyword(user, keyword, sortOrder);
+            orders = orderRepository.findByKeyword(keyword, sortOrder);
         } else  {
             orders = orderRepository.findAll(sortOrder);
         }
@@ -155,7 +155,7 @@ public class OrderController {
             ));
         }
 
-        // Создаем новый ордер
+        // Создаем новую заявку
         Order order = new Order();
         order.setSeller(user);
         order.setSourceCurrency(sourceCurrency);
@@ -163,7 +163,7 @@ public class OrderController {
         order.setAmount(orderRequest.getAmount());
         order.setPrice(orderRequest.getPrice());
 
-        // Сохраняем ордер в базу данных
+        // Сохраняем заявку в базу данных
         orderRepository.save(order);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
@@ -190,22 +190,22 @@ public class OrderController {
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Ордер не найден"));
+                .orElseThrow(() -> new IllegalArgumentException("Заявка не найден"));
 
-        // Проверка на статус и владельца ордера
+        // Проверка на статус и владельца заявки
         if (!"ACTIVE".equals(order.getStatus())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ордер не активен");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Заявка не активна"));
         }
 
         if (order.getSeller().getId().equals(currentUser.getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Невозможно обменять свой ордер");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message","Невозможно обменять свою заявку"));
         }
 
 
         // Проверка наличия средств на балансе
         Balance userBalance = balanceService.GetBalance(currentUser, order.getSourceCurrency());
         if (userBalance.getAmount() < order.getAmount()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Недостаточный баланс");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message","Недостаточный баланс"));
         }
 
         // Получение баланса второго пользователя, с которым происходит обмен
@@ -213,7 +213,7 @@ public class OrderController {
         Balance ownerBalance = balanceService.GetBalance(ownerUser, order.getTargetCurrency());
 
         if (ownerBalance.getAmount() < order.getAmount() * order.getPrice()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("У владельца ордера недостаточно средств для обмена");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message","У владельца заявки недостаточно средств для обмена"));
         }
 
         // Перерасчёт валют
@@ -225,12 +225,12 @@ public class OrderController {
         balanceRepository.save(userBalance);
         balanceRepository.save(ownerBalance);
 
-        // Переводим валюту на баланс владельца ордера
+        // Переводим валюту на баланс владельца заявки
         Balance targetUserBalance = balanceService.GetBalance(currentUser, order.getTargetCurrency());
         targetUserBalance.setAmount(targetUserBalance.getAmount() + exchangedAmount);
         balanceRepository.save(targetUserBalance);
 
-        // Переводим исходную валюту на баланс пользователя, принимающего ордер
+        // Переводим исходную валюту на баланс пользователя, принимающего заявку
         Balance sourceOwnerBalance = balanceService.GetBalance(ownerUser, order.getSourceCurrency());
         sourceOwnerBalance.setAmount(sourceOwnerBalance.getAmount() + order.getAmount());
         balanceRepository.save(sourceOwnerBalance);
@@ -241,6 +241,6 @@ public class OrderController {
         order.setBuyer(currentUser);
         orderRepository.save(order);
 
-        return ResponseEntity.ok("Ордер успешно обменян");
+        return ResponseEntity.ok("Заявка успешно обменяна");
     }
 }
