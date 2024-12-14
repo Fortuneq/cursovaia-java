@@ -28,7 +28,13 @@ public class UserController {
     /** Сервис для управления ролями. */
     @Autowired
     private RoleService roleService;
-    
+
+    /**
+     * Получить текущего авторизованного пользователя.
+     *
+     * @param principal Содержит информацию о текущем пользователе.
+     * @return ResponseEntity с объектом User, если пользователь найден, или статус UNAUTHORIZED, если не авторизован.
+     */
     @GetMapping("/currentUser")
     public ResponseEntity<User> getCurrentUser(Principal principal) {
         if (principal != null) {
@@ -38,7 +44,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-
+    /**
+     * Получить данные пользователя по его идентификатору.
+     *
+     * @param id Идентификатор пользователя.
+     * @return ResponseEntity с объектом User, если пользователь найден, или статус NOT_FOUND, если пользователь не найден.
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
@@ -48,7 +59,15 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-
+    /**
+     * Обновить данные пользователя по его идентификатору.
+     *
+     * @param id Идентификатор пользователя, чьи данные нужно обновить.
+     * @param user Обновленный объект пользователя.
+     * @param principal Информация о текущем авторизованном пользователе.
+     * @return ResponseEntity с обновленным объектом User, или статус NOT_FOUND, если пользователь не найден.
+     * Если текущий пользователь не имеет прав администратора или не является самим собой, то вернется статус FORBIDDEN.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user, Principal principal) {
         User existingUser = userService.get(id);
@@ -81,6 +100,12 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    /**
+     * Удалить пользователя по его идентификатору.
+     *
+     * @param id Идентификатор пользователя, которого необходимо удалить.
+     * @return ResponseEntity без содержимого (no content), если операция выполнена успешно.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -88,6 +113,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Получить список всех ролей системы.
+     *
+     * @return ResponseEntity со списком всех доступных ролей, если они найдены.
+     */
     @GetMapping("/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<Role>> getRoles() {

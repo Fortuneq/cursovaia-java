@@ -1,0 +1,6 @@
+org.example.exchangeP2P
+org.example.exchangeP2P.config
+org.example.exchangeP2P.controller
+org.example.exchangeP2P.entity
+org.example.exchangeP2P.repository
+org.example.exchangeP2P.service

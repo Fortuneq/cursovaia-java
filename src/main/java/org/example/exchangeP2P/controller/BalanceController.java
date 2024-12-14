@@ -27,7 +27,6 @@ public class BalanceController {
     private final OrderRepository orderRepository;
     private final CurrencyRepository currencyRepository;
     private final UserRepository userRepository;
-
     private final BalanceRepository balanceRepository;
 
     @Autowired
@@ -38,7 +37,11 @@ public class BalanceController {
         this.balanceRepository = balanceRepository;
     }
 
-    // Получить заявки текущего пользователя
+    /**
+     * Получить балансы текущего пользователя.
+     *
+     * @return Список балансов пользователя.
+     */
     @GetMapping("/user")
     public ResponseEntity<List<Balance>> getUserBalances() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -52,12 +55,17 @@ public class BalanceController {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
-
         List<Balance> balances = balanceRepository.findByUser(currentUser);
 
         return ResponseEntity.ok(balances);
     }
 
+    /**
+     * Пополнить баланс текущего пользователя.
+     *
+     * @param payload Данные для пополнения баланса, включая валюту и сумму.
+     * @return Статус операции с сообщением.
+     */
     @PostMapping("/top-up")
     public ResponseEntity<?> topUpBalance(@RequestBody Map<String, Object> payload) {
         try {
@@ -79,7 +87,6 @@ public class BalanceController {
                 return ResponseEntity.badRequest().body(Map.of("message", "Сумма пополнения должна быть положительной"));
             }
             Long currencyId = Long.parseLong(currencyCode);
-
 
             // Проверяем существование валюты
             var currency = currencyRepository.findById(currencyId)
@@ -105,7 +112,11 @@ public class BalanceController {
         }
     }
 
-
+    /**
+     * Получить список всех валют.
+     *
+     * @return Список валют.
+     */
     @GetMapping("/currencies")
     public ResponseEntity<List<Currency>> getCurrencies() {
         List<Currency> currencies = currencyRepository.findAll();
